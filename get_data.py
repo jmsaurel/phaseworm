@@ -164,3 +164,33 @@ def get_data(net,sta,t0,ti,chan_priority_list,data_source):
         #print('Error : unknown <%s> server type' %data_type)
         return Stream()
 
+
+# Get data from best source
+# net : network code (string)
+# sta : station code (string)
+# t0  : start time of data request
+# ti  : end time of data request
+# chan_priority_list : list of channels by decreasing priority
+# Return on obspy Stream object
+def get_data_from_client(net,sta,t0,ti,chan_priority_list,cl,data_type):
+
+    if data_type == 'waveserver' :
+        st = _get_data_ew(cl,net,sta,chan_priority_list,t0,ti)
+        return st
+
+    elif data_type == 'slink' :
+        st = _get_data_slink(cl,net,sta,chan_priority_list,t0,ti)
+        return st
+    
+    elif data_type == 'sds' :
+        st = _get_data_slink(cl,net,sta,chan_priority_list,t0,ti)
+        return st
+
+    elif data_type == 'fdsnws' :
+        st = _get_data_fdsn(cl,net,sta,chan_priority_list,t0,ti)
+        return st
+
+    else :
+        #print('Error : unknown <%s> server type' %data_type)
+        return Stream()
+
