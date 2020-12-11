@@ -119,7 +119,6 @@ class general(object):
 
         # Running mode :
         #   NORMAL : predict and send picks to EarthWorm in almost real-time
-        #   DUMMY : predict and prints out picks (no output written) in almost real-time
         #   REPLAY : predict on an old time span and prints out picks (no output written)
         #   default to NORMAL
         mode = NORMAL
@@ -132,6 +131,14 @@ class general(object):
         #   data start time to analyze
         #   start time in ISO format YYYY-mm-ddTHH:MM:SS
         starttime = 
+
+        # NORMAL and REPLAY mode, time window length in seconds to process at a time
+        #   default to 30
+        tw = 30
+
+        # Write EW picks : set to True to write TYPE_PICK_SCNL messages
+        #   default to True
+        write_picks = True
 
         """
         section='General' 
@@ -162,6 +169,10 @@ class general(object):
 
         opt = 'latency'
         self.latency = config.getfloat(section,opt) if config.has_option(
+            section,opt) else 30.0
+
+        opt = 'tw'
+        self.tw = config.getfloat(section,opt) if config.has_option(
             section,opt) else 30.0
 
         opt = 'starttime'
