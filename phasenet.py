@@ -1,7 +1,9 @@
 import numpy as np
 import tensorflow as tf
+tf.compat.v1.disable_eager_execution()
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 from detect_peaks import detect_peaks
-from model import Model
+from model import UNet
 
 class Config:
     seed = 100
@@ -54,26 +56,30 @@ def normalize(data, window=3000):
     """
 
     datan=np.zeros(shape=np.shape(data))
-    for i in range(np.shape(data)[1]):
+    for i in range(np.shape(data)[-1]):
         datan[:,i]=(data[:,i]-np.mean(datan[:,i]))/np.std(data[:,i])
 
     return datan
 
 def preprocess(data):
     data = normalize(data)
-    data = data.T
     data = data[np.newaxis,:,np.newaxis,:]
     return data
 
 def init_pred(config, opts):
-    model = Model(config, mode="pred")
-    sess_config = tf.ConfigProto()
+   # model = Model(config, mode="pred")
+   # sess_config = tf.ConfigProto()
+    model = UNet(config, mode="pred")
+    sess_config = tf.compat.v1.ConfigProto()
     sess_config.gpu_options.allow_growth = True
-    sess_config.log_device_placement = False
+   # sess_config.log_device_placement = False
 
-    sess = tf.Session(config=sess_config)
-    saver = tf.train.Saver()
-    init = tf.global_variables_initializer()
+    # sess = tf.Session(config=sess_config)
+    # saver = tf.train.Saver()
+    # init = tf.global_variables_initializer()
+    sess = tf.compat.v1.Session(config=sess_config)
+    saver = tf.compat.v1.train.Saver()
+    init = tf.compat.v1.global_variables_initializer()
     sess.run(init)
     latest_check_point = tf.train.latest_checkpoint(opts.checkpoint)
     saver.restore(sess, latest_check_point)

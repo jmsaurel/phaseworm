@@ -208,7 +208,7 @@ def run_phasenet(ti, sess, model, client, conf, ew):
         if len(st)==0:
             continue
         st.merge(method=1,fill_value='interpolate')
-        #st.detrend(type='demean')
+        st.detrend(type='demean')
         #st.taper(0.005,type='hamming')
         try :
             st.interpolate(sampling_rate=sps)
@@ -238,7 +238,7 @@ def run_phasenet(ti, sess, model, client, conf, ew):
             tr_statistics.append(tr.stats)
             tr_statistics.append(tr.stats)
             tr_statistics.append(tr.stats)
-        data=np.array(data)
+        data=np.array(data).T
     
         picks=get_prediction(data,sess,model)
         if picks :
