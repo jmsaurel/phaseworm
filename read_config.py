@@ -27,6 +27,10 @@ class earthworm(object):
         #   default to MOD_WILDCARD
         MyModuleID = MOD_PHASENET
 
+        # EarthWorm ring to write messages (must be defined in earthworm.d)
+        #   default to PICK_RING
+        OutRing = PICK_RING
+
         # File to keep track of the pick number (must be unique to each PhaseNet instance)
         #   default to /tmp/PhaseNet_next_pick_number
         nb_pick_keeper = /tmp/next_pick_number
@@ -45,6 +49,10 @@ class earthworm(object):
         opt = 'MyModuleID'
         self.MyModuleID = config.get(section,opt) if config.has_option(
             section,opt) else '/opt/earthworm/run_prod/params'
+
+        opt = 'OutRing'
+        self.OutRing = config.get(section,opt) if config.has_option(
+            section,opt) else 'PICK_RING'
 
         opt = 'nb_pick_keeper'
         self.nb_pick_keeper = config.get(section,opt) if config.has_option(

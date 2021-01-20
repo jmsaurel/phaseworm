@@ -81,6 +81,7 @@ class EarthWorm():
         self.instid = 255
         self.modid = 0
         self.msgtype = 8
+        self.outring = 1000
 
     def read_conf(self,opts):
         import os
@@ -98,14 +99,15 @@ class EarthWorm():
             f.close()
         except :
             print('ERROR : unable to open file %s' %file)
-        # Search ModuleID in earthworm.d file
+        # Search ModuleID, OutRing in earthworm.d file
         file = os.path.join(opts.params, 'earthworm.d')
         try :
             f = open(file, 'r', encoding='latin-1')
             for line in f:
                 if opts.MyModuleID in line:
                     self.modid = int(line.split()[2])
-                    break
+                elif opts.OutRing in line:
+                    self.outring = int(line.split()[2])
             f.close()
         except :
             print('ERROR : unable to open file %s' %file)
