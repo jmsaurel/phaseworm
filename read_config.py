@@ -1,5 +1,5 @@
 # xxxx - PhaseNet picker prediction to EarthWorm
-# Copyright (C) 2020-  
+# Copyright (C) 2020-
 # Lise Retailleau (retailleau@ipgp.fr)
 # Jean-Marie Saurel (saurel@ipgp.fr)
 # Licensed under GNU GPLv3 (see LICENSE.txt)
@@ -7,9 +7,9 @@
 import configparser
 
 
-class earthworm(object): 
+class earthworm(object):
 
-    def __init__(self, config): 
+    def __init__(self, config):
 
         """
         Private class
@@ -36,7 +36,7 @@ class earthworm(object):
         nb_pick_keeper = /tmp/next_pick_number
 
         """
-        section = 'EarthWorm' 
+        section = 'EarthWorm'
 
         opt = 'params'
         self.params = config.get(section,opt) if config.has_option(
@@ -63,9 +63,9 @@ class earthworm(object):
             section,opt) else '/opt/earthworm/run_prod/PICK_SCNL'
 
 
-class phasenet(object): 
+class phasenet(object):
 
-    def __init__(self,config): 
+    def __init__(self,config):
 
         """
         Private class
@@ -76,16 +76,16 @@ class phasenet(object):
         checkpoint = ./model/190703-214543
 
         """
-        section='PhaseNet' 
+        section='PhaseNet'
 
         opt = 'checkpoint'
         self.checkpoint = config.get(section,opt) if config.has_option(
-            section,opt) else './model/190703-214543'
+            section,opt) else './phasenet/model/190703-214543'
 
 
-class general(object): 
+class general(object):
 
-    def __init__(self,config): 
+    def __init__(self,config):
 
         """
         Private class
@@ -138,7 +138,7 @@ class general(object):
         # REPLAY mode, parameter is only used in replay mode
         #   data start time to analyze
         #   start time in ISO format YYYY-mm-ddTHH:MM:SS
-        starttime = 
+        starttime =
 
         # NORMAL and REPLAY mode, time window length in seconds to process at a time
         #   default to 30
@@ -149,7 +149,7 @@ class general(object):
         write_picks = True
 
         """
-        section='General' 
+        section='General'
 
         opt = 'datasource'
         self.datasource = config.get(section,opt) if config.has_option(
@@ -192,9 +192,9 @@ class general(object):
             section,opt) else True
 
 
-class Config(object): 
-  
-    def __init__(self, configfile='config.cfg'): 
+class Config(object):
+
+    def __init__(self, configfile='config.cfg'):
 
         import read_config as rc
 
@@ -209,19 +209,18 @@ class Config(object):
 
         Each section is parsed and read by its class (see above)
         """
-  
-        self.configfile = configfile 
-  
-        # Load parameters from config file 
-        config = configparser.ConfigParser() 
-        config.read(self.configfile) 
+
+        self.configfile = configfile
+
+        # Load parameters from config file
+        config = configparser.ConfigParser()
+        config.read(self.configfile)
 
         # Read EarthWorm section parameters
-        self.earthworm = rc.earthworm(config) 
+        self.earthworm = rc.earthworm(config)
 
         # Read PhaseNet section parameters
-        self.phasenet = rc.phasenet(config) 
+        self.phasenet = rc.phasenet(config)
 
         # Read Setting section parameters
-        self.general = rc.general(config) 
-
+        self.general = rc.general(config)

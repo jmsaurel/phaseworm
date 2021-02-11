@@ -3,7 +3,9 @@ import obspy
 import numpy as np
 from obspy.core import UTCDateTime
 import time
+import sys
 
+sys.path.append('./phasenet')
 
 """
 usage: pick_PhNet [-h] [-c CONFIG_FILE]
@@ -183,7 +185,7 @@ def get_client(data_source):
 def run_phasenet(ti, sess, model, client, conf, ew):
 
     from get_data import get_data_from_client
-    from phasenet import get_prediction,init_pred
+    from app import get_prediction,init_pred
 
     npicks = 0
 
@@ -344,8 +346,8 @@ def write_pick(msg,conf, pkid):
 def run_loop():
     """Parse arguments, read config and loop infinitely"""
     import read_config
-    import phasenet
-    from phasenet import init_pred
+    import app
+    from app import init_pred
 
     args = parse_args()
 
@@ -357,10 +359,10 @@ def run_loop():
     else:
         conf = read_config.Config()
     # Neural network model configuration
-    phasenet_config = phasenet.Config()
+    phasenet_config = app.Config()
     phasenet_config.sampling_rate = conf.general.sps
     phasenet_config.dt = 1.0 / conf.general.sps
-    n = conf.general.sps * conf.general.tw
+    n = int(conf.general.sps * conf.general.tw)
     phasenet_config.X_shape = (n, 1, phasenet_config.n_channel)
     phasenet_config.Y_shape = (n, 1, phasenet_config.n_class)
     phasenet_config.min_event_gap = 3 * conf.general.sps
