@@ -17,11 +17,11 @@ from obspy.core.stream import Stream
 def _get_data_sds(sdsclient, net, sta, chan_priority_list, t0, ti):
     try :
         st = sdsclient.get_waveforms(net,sta,"*","*",t0,ti)
-    except :
+    except Exception:
         s = Stream()
     else :
         for c in chan_priority_list:
-            s = st.select(channel=c) 
+            s = st.select(channel=c)
             if s :
                 break
     finally :
@@ -39,7 +39,7 @@ def _get_data_ew(ewclient, net, sta, chan_priority_list, t0, ti):
     for c in chan_priority_list:
         try :
             available_data = ewclient.get_availability(net,sta,"*",c)
-        except :
+        except Exception:
             st = Stream()
         else :
             if available_data:
@@ -63,7 +63,7 @@ def _get_data_slink(slclient, net, sta, chan_priority_list, t0, ti):
     for c in chan_priority_list:
         try :
             available_chans = slclient.get_info(net,sta,"*",c, level='channel')
-        except :
+        except Exception:
             st = Stream()
         else :
             if available_chans:
@@ -85,11 +85,11 @@ def _get_data_slink(slclient, net, sta, chan_priority_list, t0, ti):
 def _get_data_fdsn(wsclient, net, sta, chan_priority_list, t0, ti):
     try :
         st = wsclient.get_waveforms(net,sta,"*","*",t0,ti)
-    except :
+    except Exception:
         s = Stream()
     else :
         for c in chan_priority_list:
-            s = st.select(channel=c) 
+            s = st.select(channel=c)
             if s :
                 break
     finally :
@@ -111,7 +111,7 @@ def get_data_from_client(net,sta,t0,ti,chan_priority_list,cl,data_type):
     elif data_type == 'slink' :
         st = _get_data_slink(cl,net,sta,chan_priority_list,t0,ti)
         return st
-    
+
     elif data_type == 'sds' :
         st = _get_data_slink(cl,net,sta,chan_priority_list,t0,ti)
         return st
@@ -123,4 +123,3 @@ def get_data_from_client(net,sta,t0,ti,chan_priority_list,cl,data_type):
     else :
         #print('Error : unknown <%s> server type' %data_type)
         return Stream()
-

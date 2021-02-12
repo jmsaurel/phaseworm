@@ -94,12 +94,12 @@ class EarthWorm():
         try :
             f = open(file, 'r', encoding='latin-1')
             for line in f:
-                if opt.MyInstitutionID in line:
+                if opts.MyInstitutionID in line:
                     self.instid = int(line.split()[2])
                 elif 'TYPE_PICK_SCNL' in line:
                     self.msgtype = int(line.split()[2])
             f.close()
-        except :
+        except OSError:
             print('ERROR : unable to open file %s' %file)
         # Search ModuleID, OutRing in earthworm.d file
         file = os.path.join(opts.params, 'earthworm.d')
@@ -111,7 +111,7 @@ class EarthWorm():
                 elif opts.OutRing in line:
                     self.outring = int(line.split()[2])
             f.close()
-        except :
+        except OSError:
             print('ERROR : unable to open file %s' %file)
 
 
@@ -161,7 +161,7 @@ def get_client(data_source):
             port = int(slink[1])
         client = seedlink.Client(slink[0], port=port, timeout=2.0)
         return client
-    
+
     elif data_type == 'sds' :
         # SDS = '/data/SDS'
         SDS = data_server
@@ -171,7 +171,7 @@ def get_client(data_source):
         # fdsn_ws = 'http://195.83.188.34:8080'
         try :
             client = fdsn.Client(data_server)
-        except :
+        except Exception:
             print('Error : failed to connect to %s FDSN webservice' %data_server)
         else :
             return client
@@ -197,11 +197,11 @@ def run_phasenet(ti, sess, model, client, conf, ew):
     NetSta_list = list(conf.general.station_list.split(','))
     Net = [netsta.split('.')[0] for netsta in NetSta_list]
     Sta = [netsta.split('.')[1] for netsta in NetSta_list]
-        
+
     chan_list = list(conf.general.chan_list.split(','))
 
-    t0=ti-tw 
-    
+    t0=ti-tw
+
     for ista in range(len(Sta)):
         print(Sta[ista])
         st = get_data_from_client(Net[ista],Sta[ista],t0,ti,chan_list,client,client_type)
@@ -214,7 +214,7 @@ def run_phasenet(ti, sess, model, client, conf, ew):
         #st.taper(0.005,type='hamming')
         try :
             st.interpolate(sampling_rate=sps)
-        except :
+        except Exception:
             continue
         st=st.slice(starttime=t0,endtime=ti)
         st=st.sort()
@@ -241,7 +241,7 @@ def run_phasenet(ti, sess, model, client, conf, ew):
             tr_statistics.append(tr.stats)
             tr_statistics.append(tr.stats)
         data=np.array(data).T
-    
+
         picks=get_prediction(data,sess,model)
         if picks :
             npicks += process_picks(picks, tr_statistics, ew, conf)
@@ -377,7 +377,7 @@ def run_loop():
         exit()
     # Init EarthWorm values
     ew = EarthWorm()
-    ew.read_conf(conf.earthworm) 
+    ew.read_conf(conf.earthworm)
     if conf.general.debug :
         print("EarthWorm configuration initialized")
     # Run infinite loop from RealTime
@@ -425,4 +425,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
