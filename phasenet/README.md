@@ -4,9 +4,9 @@
 
 ### Using Anaconda (recommend)
 ```bash
-conda create --name venv python=3.6
+conda create --name venv python=3.8
 conda activate venv
-conda install tensorflow=1.10 matplotlib scipy pandas tqdm
+conda install tensorflow=2.3 matplotlib scipy pandas tqdm
 conda install libiconv
 conda install obspy -c conda-forge
 ```
