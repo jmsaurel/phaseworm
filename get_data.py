@@ -1,8 +1,9 @@
-from obspy.core import UTCDateTime
-from obspy.clients import seedlink
-from obspy.clients import earthworm
-from obspy.clients import fdsn
-from obspy.clients.filesystem import sds
+"""Module to provide data from various clients."""
+# from obspy.core import UTCDateTime
+# from obspy.clients import seedlink
+# from obspy.clients import earthworm
+# from obspy.clients import fdsn
+# from obspy.clients.filesystem import sds
 from obspy.core.stream import Stream
 
 
@@ -15,17 +16,18 @@ from obspy.core.stream import Stream
 # ti : end time of data request
 # Return an obspy Stream()
 def _get_data_sds(sdsclient, net, sta, chan_priority_list, t0, ti):
-    try :
-        st = sdsclient.get_waveforms(net,sta,"*","*",t0,ti)
+    try:
+        st = sdsclient.get_waveforms(net, sta, "*", "*", t0, ti)
     except Exception:
         s = Stream()
-    else :
+    else:
         for c in chan_priority_list:
             s = st.select(channel=c)
-            if s :
+            if s:
                 break
-    finally :
+    finally:
         return s
+
 
 # Get data from an EarthWorm WaveServerV
 # ewclient : WaveServerV Client
@@ -37,16 +39,16 @@ def _get_data_sds(sdsclient, net, sta, chan_priority_list, t0, ti):
 # Return an obspy Stream()
 def _get_data_ew(ewclient, net, sta, chan_priority_list, t0, ti):
     for c in chan_priority_list:
-        try :
-            available_data = ewclient.get_availability(net,sta,"*",c)
+        try:
+            available_data = ewclient.get_availability(net, sta, "*", c)
         except Exception:
             st = Stream()
-        else :
+        else:
             if available_data:
                 loc = str(available_data[0][2])
-                st = ewclient.get_waveforms(net,sta,loc,c,t0,ti)
+                st = ewclient.get_waveforms(net, sta, loc, c, t0, ti)
                 break
-            else :
+            else:
                 st = Stream()
     return st
 
@@ -61,18 +63,20 @@ def _get_data_ew(ewclient, net, sta, chan_priority_list, t0, ti):
 # Return an obspy Stream()
 def _get_data_slink(slclient, net, sta, chan_priority_list, t0, ti):
     for c in chan_priority_list:
-        try :
-            available_chans = slclient.get_info(net,sta,"*",c, level='channel')
+        try:
+            available_chans = slclient.get_info(
+                                net, sta, "*", c, level='channel')
         except Exception:
             st = Stream()
-        else :
+        else:
             if available_chans:
                 loc = str(available_chans[0][2])
-                st = slclient.get_waveforms(net,sta,loc,c,t0,ti)
+                st = slclient.get_waveforms(net, sta, loc, c, t0, ti)
                 break
-            else :
+            else:
                 st = Stream()
     return st
+
 
 # Get data from and FDSN webservice
 # wsclient : FDSN webservice Client
@@ -83,17 +87,18 @@ def _get_data_slink(slclient, net, sta, chan_priority_list, t0, ti):
 # ti : end time of data request
 # Return an obspy Stream()
 def _get_data_fdsn(wsclient, net, sta, chan_priority_list, t0, ti):
-    try :
-        st = wsclient.get_waveforms(net,sta,"*","*",t0,ti)
+    try:
+        st = wsclient.get_waveforms(net, sta, "*", "*", t0, ti)
     except Exception:
         s = Stream()
-    else :
+    else:
         for c in chan_priority_list:
             s = st.select(channel=c)
-            if s :
+            if s:
                 break
-    finally :
+    finally:
         return s
+
 
 # Get data from best source
 # net : network code (string)
@@ -102,24 +107,24 @@ def _get_data_fdsn(wsclient, net, sta, chan_priority_list, t0, ti):
 # ti  : end time of data request
 # chan_priority_list : list of channels by decreasing priority
 # Return on obspy Stream object
-def get_data_from_client(net,sta,t0,ti,chan_priority_list,cl,data_type):
-
-    if data_type == 'waveserver' :
-        st = _get_data_ew(cl,net,sta,chan_priority_list,t0,ti)
+def get_data_from_client(net, sta, t0, ti, chan_priority_list, cl, data_type):
+    """Get snippet of data for net.sta station from cl Client."""
+    if data_type == 'waveserver':
+        st = _get_data_ew(cl, net, sta, chan_priority_list, t0, ti)
         return st
 
-    elif data_type == 'slink' :
-        st = _get_data_slink(cl,net,sta,chan_priority_list,t0,ti)
+    elif data_type == 'slink':
+        st = _get_data_slink(cl, net, sta, chan_priority_list, t0, ti)
         return st
 
-    elif data_type == 'sds' :
-        st = _get_data_slink(cl,net,sta,chan_priority_list,t0,ti)
+    elif data_type == 'sds':
+        st = _get_data_slink(cl, net, sta, chan_priority_list, t0, ti)
         return st
 
-    elif data_type == 'fdsnws' :
-        st = _get_data_fdsn(cl,net,sta,chan_priority_list,t0,ti)
+    elif data_type == 'fdsnws':
+        st = _get_data_fdsn(cl, net, sta, chan_priority_list, t0, ti)
         return st
 
-    else :
-        #print('Error : unknown <%s> server type' %data_type)
+    else:
+        # print('Error : unknown <%s> server type' %data_type)
         return Stream()

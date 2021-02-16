@@ -4,16 +4,18 @@
 # Jean-Marie Saurel (saurel@ipgp.fr)
 # Licensed under GNU GPLv3 (see LICENSE.txt)
 
+"""Configuration reading."""
+
 import configparser
+import read_config as rc
 
 
 class earthworm(object):
+    """Private class to store EarthWorm configuration."""
 
     def __init__(self, config):
-
         """
-        Private class
-        Defines the EarthWorm configuration values read from the configuration file
+        Initialize the EarthWorm configuration values.
 
         # Directory where to find EarthWorm .d configuration files
         #   default to /opt/earthworm/run_prod/params
@@ -23,7 +25,8 @@ class earthworm(object):
         #   default to INST_UNKNOWN
         MyInstitutionID = INST_REVOSIMA
 
-        # EarthWorm Module ID assigned to this app (must be defined in earthworm.d)
+        # EarthWorm Module ID assigned to this app
+        # (must be defined in earthworm.d)
         #   default to MOD_WILDCARD
         MyModuleID = MOD_PHASENET
 
@@ -31,68 +34,67 @@ class earthworm(object):
         #   default to PICK_RING
         OutRing = PICK_RING
 
-        # File to keep track of the pick number (must be unique to each PhaseNet instance)
+        # File to keep track of the pick number
+        # (must be unique to each PhaseNet instance)
         #   default to /tmp/PhaseNet_next_pick_number
         nb_pick_keeper = /tmp/next_pick_number
-
         """
         section = 'EarthWorm'
 
         opt = 'params'
-        self.params = config.get(section,opt) if config.has_option(
-            section,opt) else '/opt/earthworm/run_prod/params'
+        self.params = config.get(section, opt) if config.has_option(
+            section, opt) else '/opt/earthworm/run_prod/params'
 
         opt = 'MyInstitutionID'
-        self.MyInstitutionID = config.get(section,opt) if config.has_option(
-            section,opt) else 'INST_UNKNOWN'
+        self.MyInstitutionID = config.get(section, opt) if config.has_option(
+            section, opt) else 'INST_UNKNOWN'
 
         opt = 'MyModuleID'
-        self.MyModuleID = config.get(section,opt) if config.has_option(
-            section,opt) else '/opt/earthworm/run_prod/params'
+        self.MyModuleID = config.get(section, opt) if config.has_option(
+            section, opt) else '/opt/earthworm/run_prod/params'
 
         opt = 'OutRing'
-        self.OutRing = config.get(section,opt) if config.has_option(
-            section,opt) else 'PICK_RING'
+        self.OutRing = config.get(section, opt) if config.has_option(
+            section, opt) else 'PICK_RING'
 
         opt = 'nb_pick_keeper'
-        self.nb_pick_keeper = config.get(section,opt) if config.has_option(
-            section,opt) else '/tmp/PhaseNet_next_pick_number'
+        self.nb_pick_keeper = config.get(section, opt) if config.has_option(
+            section, opt) else '/tmp/PhaseNet_next_pick_number'
 
         opt = 'pick_dir'
-        self.pick_dir = config.get(section,opt) if config.has_option(
-            section,opt) else '/opt/earthworm/run_prod/PICK_SCNL'
+        self.pick_dir = config.get(section, opt) if config.has_option(
+            section, opt) else '/opt/earthworm/run_prod/PICK_SCNL'
 
 
 class phasenet(object):
+    """Private class to store PhaseNet configuration."""
 
-    def __init__(self,config):
-
+    def __init__(self, config):
         """
-        Private class
-        Defines the PhaseNet configuration values read from the configuration file
+        Initialize the PhaseNet configuration values.
 
         # PhaseNet neural network directory
         #   default to ./model/190703-214543
         checkpoint = ./model/190703-214543
-
         """
-        section='PhaseNet'
+        section = 'PhaseNet'
 
         opt = 'checkpoint'
-        self.checkpoint = config.get(section,opt) if config.has_option(
-            section,opt) else './phasenet/model/190703-214543'
+        self.checkpoint = config.get(section, opt) if config.has_option(
+            section, opt) else './phasenet/model/190703-214543'
 
 
 class general(object):
+    """Private class to store all general configuration variables."""
 
-    def __init__(self,config):
-
+    def __init__(self, config):
         """
-        Private class
-        Defines the general configuration values read from the configuration file
+        Initialize the general configuration values.
 
         # Configuration of the data source to use
-        # Can be an FDSN dataselect webservice, a SeedLink server or an EarthWorm WaveServerV
+        # Can be an FDSN dataselect webservice,
+        # a SeedLink server
+        # or an EarthWorm WaveServerV
         #   default to IRIS
         # FDSN : can be one ObsPy server (see obspy.clients.fdsn for full list)
         #   e.g., datasource = IRIS
@@ -127,11 +129,13 @@ class general(object):
 
         # Running mode :
         #   NORMAL : predict and send picks to EarthWorm in almost real-time
-        #   REPLAY : predict on an old time span and prints out picks (no output written)
+        #   REPLAY : predict on an old time span and prints out picks
+        #            (no output written)
         #   default to NORMAL
         mode = NORMAL
 
-        # NORMAL and DUMMY mode, wait latency seconds after real-time before requesting data
+        # NORMAL and DUMMY mode, wait latency seconds after real-time
+        # before requesting data
         #   default to 10s
         latency = 10
 
@@ -140,7 +144,8 @@ class general(object):
         #   start time in ISO format YYYY-mm-ddTHH:MM:SS
         starttime =
 
-        # NORMAL and REPLAY mode, time window length in seconds to process at a time
+        # NORMAL and REPLAY mode, time window length in seconds
+        # to process at a time
         #   default to 30
         tw = 30
 
@@ -149,67 +154,64 @@ class general(object):
         write_picks = True
 
         """
-        section='General'
+        section = 'General'
 
         opt = 'datasource'
-        self.datasource = config.get(section,opt) if config.has_option(
-            section,opt) else 'IRIS'
+        self.datasource = config.get(section, opt) if config.has_option(
+            section, opt) else 'IRIS'
 
         opt = 'chan_list'
-        self.chan_list = config.get(section,opt) if config.has_option(
-            section,opt) else 'HH?,BH?,HN?'
+        self.chan_list = config.get(section, opt) if config.has_option(
+            section, opt) else 'HH?,BH?,HN?'
 
         opt = 'station_list'
-        self.station_list = config.get(section,opt) if config.has_option(
-            section,opt) else ''
+        self.station_list = config.get(section, opt) if config.has_option(
+            section, opt) else ''
 
         opt = 'sps'
-        self.sps = config.getint(section,opt) if config.has_option(
-            section,opt) else 100
+        self.sps = config.getint(section, opt) if config.has_option(
+            section, opt) else 100
 
         opt = 'debug'
-        self.debug = config.getboolean(section,opt) if config.has_option(
-            section,opt) else False
+        self.debug = config.getboolean(section, opt) if config.has_option(
+            section, opt) else False
 
         opt = 'mode'
-        self.mode = config.get(section,opt) if config.has_option(
-            section,opt) else 'NORMAL'
+        self.mode = config.get(section, opt) if config.has_option(
+            section, opt) else 'NORMAL'
 
         opt = 'latency'
-        self.latency = config.getfloat(section,opt) if config.has_option(
-            section,opt) else 30.0
+        self.latency = config.getfloat(section, opt) if config.has_option(
+            section, opt) else 30.0
 
         opt = 'tw'
-        self.tw = config.getfloat(section,opt) if config.has_option(
-            section,opt) else 30.0
+        self.tw = config.getfloat(section, opt) if config.has_option(
+            section, opt) else 30.0
 
         opt = 'starttime'
-        self.starttime = config.get(section,opt) if config.has_option(
-            section,opt) else ''
+        self.starttime = config.get(section, opt) if config.has_option(
+            section, opt) else ''
 
         opt = 'write_picks'
-        self.write_picks = config.getboolean(section,opt) if config.has_option(
-            section,opt) else True
+        self.write_picks = config.getboolean(
+            section, opt) if config.has_option(section, opt) else True
 
 
 class Config(object):
+    """Private class to store all the configuration."""
 
     def __init__(self, configfile='config.cfg'):
-
-        import read_config as rc
-
         """
-        Defines the configurations values read from the configuration file
-        and used by various routines.
+        Initialize the configurations values read from the configuration file.
 
-        The file is divided in 3 main sections, each one prefixed with a [] header :
+        The file is divided in 3 main sections, each one prefixed
+        with a [] header :
             * EarthWorm for output related configuration
             * PhaseNet for the prediction related configuration
             * Setting for general configuration of the picker
 
         Each section is parsed and read by its class (see above)
         """
-
         self.configfile = configfile
 
         # Load parameters from config file
