@@ -17,16 +17,14 @@ from obspy.core.stream import Stream
 # Return an obspy Stream()
 def _get_data_sds(sdsclient, net, sta, chan_priority_list, t0, ti):
     try:
-        st = sdsclient.get_waveforms(net, sta, "*", "*", t0, ti)
+        st_all = sdsclient.get_waveforms(net, sta, "*", "*", t0, ti)
     except Exception:
-        s = Stream()
-    else:
-        for c in chan_priority_list:
-            s = st.select(channel=c)
-            if s:
-                break
-    finally:
-        return s
+        st_all = Stream()
+    for c in chan_priority_list:
+        st = st_all.select(channel=c)
+        if st:
+            break
+    return st
 
 
 # Get data from an EarthWorm WaveServerV
@@ -43,13 +41,12 @@ def _get_data_ew(ewclient, net, sta, chan_priority_list, t0, ti):
             available_data = ewclient.get_availability(net, sta, "*", c)
         except Exception:
             st = Stream()
+        if available_data:
+            loc = str(available_data[0][2])
+            st = ewclient.get_waveforms(net, sta, loc, c, t0, ti)
+            break
         else:
-            if available_data:
-                loc = str(available_data[0][2])
-                st = ewclient.get_waveforms(net, sta, loc, c, t0, ti)
-                break
-            else:
-                st = Stream()
+            st = Stream()
     return st
 
 
@@ -68,13 +65,12 @@ def _get_data_slink(slclient, net, sta, chan_priority_list, t0, ti):
                                 net, sta, "*", c, level='channel')
         except Exception:
             st = Stream()
+        if available_chans:
+            loc = str(available_chans[0][2])
+            st = slclient.get_waveforms(net, sta, loc, c, t0, ti)
+            break
         else:
-            if available_chans:
-                loc = str(available_chans[0][2])
-                st = slclient.get_waveforms(net, sta, loc, c, t0, ti)
-                break
-            else:
-                st = Stream()
+            st = Stream()
     return st
 
 
@@ -88,16 +84,14 @@ def _get_data_slink(slclient, net, sta, chan_priority_list, t0, ti):
 # Return an obspy Stream()
 def _get_data_fdsn(wsclient, net, sta, chan_priority_list, t0, ti):
     try:
-        st = wsclient.get_waveforms(net, sta, "*", "*", t0, ti)
+        st_all = wsclient.get_waveforms(net, sta, "*", "*", t0, ti)
     except Exception:
-        s = Stream()
-    else:
-        for c in chan_priority_list:
-            s = st.select(channel=c)
-            if s:
-                break
-    finally:
-        return s
+        st_all = Stream()
+    for c in chan_priority_list:
+        st = st_all.select(channel=c)
+        if st:
+            break
+    return st
 
 
 # Get data from best source

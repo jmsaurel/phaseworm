@@ -10,12 +10,12 @@ optional arguments:
                         default config.cfg
 """
 
-# import obspy
 import os
 import sys
 import shutil
 import tempfile
 import time
+import argparse
 from obspy.core import UTCDateTime
 from obspy.clients import seedlink
 from obspy.clients import earthworm
@@ -133,8 +133,6 @@ class EarthWorm():
 # ___ INIT FUNCTIONS __________________________________________________________
 def parse_args():
     """Parse command line arguments."""
-    import argparse
-
     parser = argparse.ArgumentParser(description="Run PhaseNet picker")
 
     parser.add_argument("-c", "--configfile",
@@ -192,7 +190,6 @@ def get_client(data_source):
 # ___ PICK PREDICTION AND PROCESSING __________________________________________
 def run_phasenet(ti, sess, model, client, conf, ew):
     """Send data snippet to PhaseNet for prediction."""
-
     npicks = 0
 
     client_type = conf.general.datasource.split('://', 1)[0]
@@ -258,8 +255,6 @@ def run_phasenet(ti, sess, model, client, conf, ew):
 
 def process_picks(picks, traces_stats, ew, conf):
     """Process PhaseNet predictions."""
-    import os
-
     npicks = 0
     if conf.general.debug:
         print("Processing <%s> picks" % (traces_stats[0].station))
@@ -422,8 +417,6 @@ def run_loop():
 
 def main():
     """Run the main loop and handle ctrl-C events."""
-    import sys
-
     try:
         run_loop()
     except KeyboardInterrupt:
