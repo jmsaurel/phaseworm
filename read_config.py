@@ -8,6 +8,7 @@
 
 import configparser
 import read_config as rc
+import os
 
 
 class earthworm(object):
@@ -42,8 +43,9 @@ class earthworm(object):
         section = 'EarthWorm'
 
         opt = 'params'
-        self.params = config.get(section, opt) if config.has_option(
+        path = config.get(section, opt) if config.has_option(
             section, opt) else '/opt/earthworm/run_prod/params'
+        self.params = os.path.normpath(path)
 
         opt = 'MyInstitutionID'
         self.MyInstitutionID = config.get(section, opt) if config.has_option(
@@ -58,12 +60,14 @@ class earthworm(object):
             section, opt) else 'PICK_RING'
 
         opt = 'nb_pick_keeper'
-        self.nb_pick_keeper = config.get(section, opt) if config.has_option(
+        path = config.get(section, opt) if config.has_option(
             section, opt) else '/tmp/PhaseNet_next_pick_number'
+        self.nb_pick_keeper = os.path.normpath(path)
 
         opt = 'pick_dir'
-        self.pick_dir = config.get(section, opt) if config.has_option(
+        path = config.get(section, opt) if config.has_option(
             section, opt) else '/opt/earthworm/run_prod/PICK_SCNL'
+        self.pick_dir = os.path.normpath(path)
 
 
 class phasenet(object):
@@ -74,14 +78,16 @@ class phasenet(object):
         Initialize the PhaseNet configuration values.
 
         # PhaseNet neural network directory
-        #   default to ./model/190703-214543
-        checkpoint = ./model/190703-214543
+        # Absolute path or path relative to pick_PhNet root directory
+        #   default to phasenet/model/190703-214543
+        checkpoint = phasenet/model/190703-214543
         """
         section = 'PhaseNet'
 
         opt = 'checkpoint'
-        self.checkpoint = config.get(section, opt) if config.has_option(
-            section, opt) else './phasenet/model/190703-214543'
+        path = config.get(section, opt) if config.has_option(
+            section, opt) else 'phasenet/model/190703-214543'
+        self.checkpoint = os.path.normpath(path)
 
 
 class general(object):

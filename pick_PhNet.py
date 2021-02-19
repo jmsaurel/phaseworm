@@ -10,8 +10,8 @@ optional arguments:
                         default config.cfg
 """
 
-import os
 import sys
+import os
 import shutil
 import tempfile
 import time
@@ -23,12 +23,9 @@ from obspy.clients import fdsn
 from obspy.clients.filesystem import sds
 import numpy as np
 from get_data import get_data_from_client
-import app
-from app import get_prediction, init_pred
 import read_config
-
-
-sys.path.append('./phasenet')
+from phasenet import app
+from phasenet.app import get_prediction, init_pred
 
 
 # ___ DATA TYPES ______________________________________________________________
@@ -360,6 +357,10 @@ def run_loop():
             print("Configuration file <%s> read" % (args.configfile))
     else:
         conf = read_config.Config()
+    if not os.path.isabs(conf.phasenet.checkpoint):
+        appdir = os.path.dirname(os.path.abspath(__file__))
+        conf.phasenet.checkpoint = os.path.join(appdir,
+                                                conf.phasenet.checkpoint)
     # Neural network model configuration
     phasenet_config = app.Config()
     phasenet_config.sampling_rate = conf.general.sps

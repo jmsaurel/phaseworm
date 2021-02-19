@@ -8,8 +8,8 @@ from scipy.interpolate import interp1d
 #from dataclasses import dataclass
 #from collections import namedtuple
 #from data_reader import DataReader_mseed
-from detect_peaks import detect_peaks
-from model import UNet
+from .detect_peaks import detect_peaks
+from .model import UNet
 
 #app = Flask(__name__)
 
@@ -133,7 +133,7 @@ def get_prediction(data,sess,model):
 
     data = preprocess(data)
 
-    
+
     feed = {model.X: data,
             model.drop_rate: 0,
             model.is_training: False}
@@ -143,7 +143,7 @@ def get_prediction(data,sess,model):
     picks = extact_picks(preds)
 
     return picks
- 
+
 
 #@app.route('/predict', methods=['POST'])
 def predict(data,sess,model):
