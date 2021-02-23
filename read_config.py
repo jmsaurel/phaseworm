@@ -78,7 +78,7 @@ class phasenet(object):
         Initialize the PhaseNet configuration values.
 
         # PhaseNet neural network directory
-        # Absolute path or path relative to pick_PhNet root directory
+        # Absolute path or path relative to phaseworm root directory
         #   default to phasenet/model/190703-214543
         checkpoint = phasenet/model/190703-214543
         """

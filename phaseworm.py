@@ -1,7 +1,7 @@
 """
 PhaseNet wrapper to EarthWorm.
 
-usage: pick_PhNet [-h] [-c CONFIG_FILE]
+usage: phaseworm [-h] [-c CONFIG_FILE]
 
 optional arguments:
   -h, --help            show this help message and exit
