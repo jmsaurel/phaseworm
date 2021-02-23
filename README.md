@@ -1,7 +1,8 @@
 # PhaseWorm
 
-This python script wraps-up PhaseNet (ref) for use as a picker within
-an EarthWorm installation.
+This python script wrap-up [PhaseNet](https://github.com/wayneweiqiang/PhaseNet)
+for use as a picker within an [EarthWorm](http://www.earthwormcentral.org/)
+installation.
 
 PhaseWorm can access data from 3 differents data sources, using ObsPy clients :
 * SeedLink
@@ -20,8 +21,9 @@ respectively, vertical and horizontal channels.
 ---
 ## Installation and configuration
 #### Dependencies
-The _PhaseWorm_ code has been tested with **Python 3** and **ObsPy 1.2.2** and
-**EarthWorm v7.10**.
+The _PhaseWorm_ code has been tested with **Python 3**,
+[**ObsPy 1.2.2**](http://www.earthwormcentral.org/)
+and **EarthWorm v7.10**.
 The _PhaseNet_ included version uses **TensorFlow 2**.
 
 We recommend to use an `anaconda` environment.
