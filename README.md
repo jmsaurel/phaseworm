@@ -21,7 +21,7 @@ respectively, vertical and horizontal channels.
 ---
 ## Installation and configuration
 #### Dependencies
-The _PhaseWorm_ code has been tested with **Python 3**,
+The _PhaseWorm_ code has been developed with **Python 3**,
 [**ObsPy 1.2.2**](http://www.earthwormcentral.org/)
 and **EarthWorm v7.10**.
 The _PhaseNet_ included version uses **TensorFlow 2**.
