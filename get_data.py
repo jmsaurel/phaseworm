@@ -41,6 +41,7 @@ def _get_data_ew(ewclient, net, sta, chan_priority_list, t0, ti):
             available_data = ewclient.get_availability(net, sta, "*", c)
         except Exception:
             st = Stream()
+            available_data = []
         if available_data:
             loc = str(available_data[0][2])
             st = ewclient.get_waveforms(net, sta, loc, c, t0, ti)
@@ -65,6 +66,7 @@ def _get_data_slink(slclient, net, sta, chan_priority_list, t0, ti):
                                 net, sta, "*", c, level='channel')
         except Exception:
             st = Stream()
+            available_chans = []
         if available_chans:
             loc = str(available_chans[0][2])
             st = slclient.get_waveforms(net, sta, loc, c, t0, ti)

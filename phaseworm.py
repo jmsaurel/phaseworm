@@ -12,8 +12,6 @@ optional arguments:
 
 import sys
 import os
-import shutil
-import tempfile
 import time
 import argparse
 from obspy.core import UTCDateTime
@@ -333,14 +331,12 @@ def process_picks(picks, traces_stats, ew, conf):
 def write_pick(msg, conf, pkid):
     """Write pick message."""
     dest = conf.earthworm.pick_dir
-    fd, tmpfile = tempfile.mkstemp()
-    os.close(fd)
+    tmpfile = os.path.join(dest, 'tmp', str('%06d.pick' % pkid))
     with open(tmpfile, 'w') as f:
         f.write(msg)
         f.close()
     pick_msg = os.path.join(dest, str('%06d.pick' % pkid))
-    shutil.copyfile(tmpfile, pick_msg)
-    os.remove(tmpfile)
+    os.link(tmpfile, pick_msg)
 
 # ___ END : PICK PREDICTION AND PROCESSING ____________________________________
 
