@@ -1,0 +1,10 @@
+tensorflow==2.3
+argparse
+configparser
+os
+sys
+time
+matplotlib
+scipy
+numpy
+obspy

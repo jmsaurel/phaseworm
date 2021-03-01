@@ -20,32 +20,90 @@ respectively, vertical and horizontal channels.
 
 ---
 ## Installation and configuration
-#### Dependencies
+
 The _PhaseWorm_ code has been developed with **Python 3**,
 [**ObsPy 1.2.2**](http://www.earthwormcentral.org/)
 and **EarthWorm v7.10**.
 The _PhaseNet_ included version uses **TensorFlow 2**.
 
-We recommend to use an `anaconda` environment.
-Instructions are given in the `phasenet/README` file.
 
-git clone
+### PhaseWorm
 
-#### EarthWorm
+Download PhaseWorm by cloning the repository into your local Installation
+directory.
+```
+git clone https://github.com/jmsaurel/phaseworm.git
+```
+
+A python environment with proper libraries and modules is necessary to run
+PhaseWorm and the underlying PhaseNet.
+
+#### Using Anaconda (recommended)
+```bash
+conda create --name phaseworm python=3.8
+conda activate phaseworm
+conda install tensorflow=2.3
+conda install argparse configparser os sys time
+conda install matplotlib scipy numpy
+conda install obspy -c conda-forge
+```
+#### Using virtualenv
+```bash
+pip install virtualenv
+virtualenv .phaseworm
+source .phaseworm/bin/activate
+pip install -r requirements.txt
+```
+
+
+### EarthWorm
 _PhaseWorm_ is designed to output **TYPE_PICK_SCNL** EarthWorm messages files
 that will be read by the _file2ew_ module and injected into a RingBuffer.
 
 Because _PhaseNet_ is designed to use overlapping time sequences,
 it is recommended to use a _pkfilter_ module to remove duplicated picks.
 
+#### pkfilter
+
+PhaseNet picks predictions are equally accurate when working on overlapping
+data windows. We recommend a value of **0.05** seconds for _PickTolerance_.
+
+When working with 30s timewindows, a pick could be detected only on the next
+overlapping time window. We then allow **60s** _OlderPickLimit_ to be checked.
+
+```
+PickTolerance  0.05
+OlderPickLimit 60
+```
+
+#### binder_ew
+
 _Binder_ew_ module should be setup as usual, according to the local area
 settings. However, to take full advantage of the **P** and **S** phase
 identifications from _PhaseNet_, two parameters should be activated :
-* `no_S_on_Z` (only _PhaseNet_ **P** readings are sent on vertical channels)
-* `no_P_on_Horiz` (only _PhaseNet_ **S** readings are sent on horizontal channels)
+* no_S_on_Z (only _PhaseNet_ **P** readings are sent on vertical channels)
+* no_P_on_Horiz (only _PhaseNet_ **S** readings are sent on horizontal channels)
 
-Because _PhaseNet_ picks **S** readings, it's important to set `ReportS` key
-to `1` in _eqassemble_ module.
+Since **S** phases are sent to horizontal channel, binder_ew shouldn't be
+allowed to initiate the stack on horizontal channels
+
+Currently, PhaseNet doesn't output any amplitude pick measurements. It's
+then recommended not to use the **S** to **P** amplitude ratio setting.
+
+```
+# stack_horizontals
+# s_to_p_amp_ratio 2.0
+no_S_on_Z
+no_P_on_Horiz
+```
+
+#### eqassemble
+
+Because _PhaseNet_ picks **S** readings, it's important to activate them in _eqassemble_ module.
+
+```
+ReportS 1
+```
 
 ---
 ## Usage
@@ -59,13 +117,13 @@ phaseworm --config-file /my/path/to/my_config.cfg
 ```
 The configuration file is divided into 3 different sections.
 
-#### EarthWorm section
+### EarthWorm section
 This section defines variables linked to the EarthWorm setup that will be used
 to process the pick messages (`module_id`, `inst_id`, `message_id`).
 This section also defines the directory in which **TYPE_PICK_SCNL** messages
 will be written to.
 
-#### PhaseNet section
+### PhaseNet section
 This section defines PhaseNet related variables.
 Currently there is only one available variable : the neural network training
 file to use.
@@ -75,7 +133,7 @@ included in this bundle.
 If you have trained PhaseNet on your own data, you might want to use
 your training file.
 
-#### General section
+### General section
 The general section contains various variables to set-up _PhaseWorm_ :
 * data source
 * time window lenght to process
@@ -88,12 +146,12 @@ The general section contains various variables to set-up _PhaseWorm_ :
 ## Examples
 Two configuration examples are shipped : _config_replay.cfg_ and _config_rt.cfg_.
 
-#### Replay mode
+### Replay mode
 The file _config_replay.cfg_ contains a configuration for replay use.
 
 PhaseWorm reads data from FDSN webservice, starting from xxx until xxx.
 
-#### Real-time mode
+### Real-time mode
 The file _config_rt.cfg_ contains a configuration for near real-time use.
 
 PhaseWorm reads data from an EarthWorm WaveServerV (recommended) or SeedLink.
