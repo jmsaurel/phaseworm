@@ -14,6 +14,7 @@ import sys
 import os
 import time
 import argparse
+from logging.handlers import TimedRotatingFileHandler
 import logging
 from obspy.core import UTCDateTime
 from obspy.clients import seedlink
@@ -195,6 +196,30 @@ def get_client(data_source):
 
     else:
         print('Error : unknown <%s> server type' % data_type)
+
+
+def setup_logging(opts):
+    """Set the logging system."""
+    logfile = 'phaseworm'
+    logdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'log')
+    logfile = os.path.join(logdir, logfile)
+    os.makedirs(logdir, exist_ok=True)
+    logformat = '%(asctime)s [%(levelname)s/%(funcName)s] %(message)s'
+    logfmt = logging.Formatter(fmt=logformat, datefmt='%Y-%m-%d %H:%M:%S')
+    log_level = getattr(logging, opts.log, None)
+    console = logging.StreamHandler()
+    console.setLevel(log_level)
+    logformat = '%(message)s'
+    console.setFormatter(logfmt)
+    logging.getLogger('').addHandler(console)
+    fh = TimedRotatingFileHandler(
+        filename=logfile,
+        when='midnight',
+        interval=1,
+        utc=True)
+    fh.setLevel(log_level)
+    fh.setFormatter(logfmt)
+    logging.getLogger('').addHandler(fh)
 # ___ END : INIT FUNCTIONS ____________________________________________________
 
 
@@ -372,8 +397,9 @@ def run_loop():
         conf = read_config.Config(args.configfile)
     else:
         conf = read_config.Config()
-    log_level = getattr(logging, conf.general.log, None)
-    logging.basicConfig(level=log_level)
+    setup_logging(conf.general)
+    # log_level = getattr(logging, conf.general.log, None)
+    # logging.basicConfig(level=log_level)
     logging.debug("Configuration file <%s> read" % args.configfile)
     if not os.path.isabs(conf.phasenet.checkpoint):
         appdir = os.path.dirname(os.path.abspath(__file__))
