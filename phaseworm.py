@@ -113,7 +113,7 @@ class EarthWorm():
             f.close()
             logging.debug("Found %s = %d"
                           % (opts.MyInstitutionID, self.instid))
-            logging.debug("Found TYPE_PICK_SCNL = %d", % self.msgtype)
+            logging.debug("Found TYPE_PICK_SCNL = %d" % self.msgtype)
         except OSError:
             logging.error('Unable to open file %s' % file)
         # Search ModuleID, OutRing in earthworm.d file
@@ -126,9 +126,9 @@ class EarthWorm():
                 elif opts.OutRing in line:
                     self.outring = int(line.split()[2])
             f.close()
-            logging.debug("Found %s = %d",
+            logging.debug("Found %s = %d"
                           % (opts.MyModuleID, self.modid))
-            logging.debug("Found %s = %d",
+            logging.debug("Found %s = %d"
                           % (opts.OutRing, self.outring))
         except OSError:
             logging.error('Unable to open file %s' % file)
@@ -140,7 +140,7 @@ def parse_args():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(description="Run PhaseNet picker")
 
-    parser.add_argument("-c", "--config-file",
+    parser.add_argument("-c", "--configfile",
                         help="use configuration file named CONFIG_FILE")
     args = parser.parse_args()
 
@@ -403,17 +403,18 @@ def run_loop():
     # Run infinite loop from RealTime
     if conf.general.mode == 'NORMAL':
         while 1:
+            logging.debug('Processing %s ' % UTCDateTime.now())
             t0 = time.time()
             ti = UTCDateTime.now() - conf.general.latency
             n = run_phasenet(ti, sess, model, cl, conf, ew)
             t1 = time.time() - t0
-            logging.debug(UTCDateTime.now(), t1)
-            logging.debug('%d picks processed' % (n))
-            if t1 > conf.general.tw:
+            logging.debug('Processing time %.1fs' % t1)
+            logging.debug('%d picks processed' % n)
+            if t1 > conf.general.tw/2.0:
                 logging.warning('Process time %.1fs longer than tw %.1fs'
-                                % (t1, conf.general.tw))
+                                % t1, conf.general.tw)
             else:
-                time.sleep(conf.general.tw - t1)
+                time.sleep(conf.general.tw/2.0 - t1)
     # Run loop starting from old starttime
     elif conf.general.mode == 'REPLAY':
         ti = UTCDateTime(conf.general.starttime)
@@ -421,7 +422,7 @@ def run_loop():
             t0 = time.time()
             n = run_phasenet(ti, sess, model, cl, conf, ew)
             t1 = time.time() - t0
-            ti += conf.general.tw
+            ti += conf.general.tw/2.0
             logging.debug(ti)
             if ti > UTCDateTime.now():
                 logging.info('Reached real-time, stop replay')
