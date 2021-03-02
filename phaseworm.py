@@ -14,6 +14,7 @@ import sys
 import os
 import time
 import argparse
+import logging
 from obspy.core import UTCDateTime
 from obspy.clients import seedlink
 from obspy.clients import earthworm
@@ -73,7 +74,7 @@ class Pick():
         msg = str("%s %c %.1f %s.%s.%s.%s\n"
                   % (self.time.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],
                      self.phase, self.probability, n, s, l, c))
-        print(msg)
+        logging.info(msg)
 
     def TYPE_PICK_SCNL(self):
         """Write TYPE_PICK_SCNL message."""
@@ -109,7 +110,7 @@ class EarthWorm():
                     self.msgtype = int(line.split()[2])
             f.close()
         except OSError:
-            print('ERROR : unable to open file %s' % file)
+            logging.error('Unable to open file %s' % file)
         # Search ModuleID, OutRing in earthworm.d file
         file = os.path.join(opts.params, 'earthworm.d')
         try:
@@ -121,7 +122,7 @@ class EarthWorm():
                     self.outring = int(line.split()[2])
             f.close()
         except OSError:
-            print('ERROR : unable to open file %s' % file)
+            logging.error('Unable to open file %s' % file)
 # ___ END : DATA TYPES ________________________________________________________
 
 
@@ -172,8 +173,8 @@ def get_client(data_source):
         try:
             client = fdsn.Client(data_server)
         except Exception:
-            print('Error : failed to connect to %s FDSN webservice'
-                  % data_server)
+            logging.error('Error : failed to connect to %s FDSN webservice'
+                          % data_server)
         else:
             return client
 
@@ -201,11 +202,10 @@ def run_phasenet(ti, sess, model, client, conf, ew):
     t0 = ti-tw
 
     for ista in range(len(Sta)):
-        print(Sta[ista])
+        logging.info(Sta[ista])
         st = get_data_from_client(Net[ista], Sta[ista], t0, ti,
                                   chan_list, client, client_type)
-        if conf.general.debug:
-            print(st)
+        logging.debug(st)
         if len(st) == 0:
             continue
         st.merge(method=1, fill_value='interpolate')
@@ -251,8 +251,7 @@ def run_phasenet(ti, sess, model, client, conf, ew):
 def process_picks(picks, traces_stats, ew, conf):
     """Process PhaseNet predictions."""
     npicks = 0
-    if conf.general.debug:
-        print("Processing <%s> picks" % (traces_stats[0].station))
+    logging.debug("Processing <%s> picks" % (traces_stats[0].station))
     for pks in picks:
         # P picks are on colunms 0 and 1 (k=0)
         # S picks are on columns 2 and 3 (k=2)
@@ -305,16 +304,11 @@ def process_picks(picks, traces_stats, ew, conf):
                 # Set pick ID
                 pick.pickid = ew.pickid
                 # Convert PhaseNet probability to Hypo weight
-                pick.set_h71_weight('linear')
-                if conf.general.debug:
-                    pick.print()
+                pick.set_h71_weight(conf.general.prob_to_wt_law)
                 # Write TYPE_PICK_SCNL message
                 if conf.general.write_picks:
                     write_pick(pick.TYPE_PICK_SCNL(), conf, pick.pickid)
-                    if conf.general.debug:
-                        pick.print()
-                else:
-                    pick.print()
+                pick.print()
                 # Update pickid
                 if ew.pickid == 999999:
                     ew.pickid = 0
@@ -349,10 +343,11 @@ def run_loop():
     # Read configuration file
     if args.configfile:
         conf = read_config.Config(args.configfile)
-        if conf.general.debug:
-            print("Configuration file <%s> read" % (args.configfile))
     else:
         conf = read_config.Config()
+    log_level = getattr(logging, conf.general.log, None)
+    logging.basicConfig(level=log_level)
+    logging.debug("Configuration file <%s> read" % (args.configfile))
     if not os.path.isabs(conf.phasenet.checkpoint):
         appdir = os.path.dirname(os.path.abspath(__file__))
         conf.phasenet.checkpoint = os.path.join(appdir,
@@ -367,19 +362,17 @@ def run_loop():
     phasenet_config.min_event_gap = 3 * conf.general.sps
     # Init neural network model
     sess, model = init_pred(phasenet_config, conf.phasenet)
-    if conf.general.debug:
-        print("Tensor flow model <%s> initialized"
-              % (conf.phasenet.checkpoint))
+    logging.debug("Tensor flow model <%s> initialized"
+          % (conf.phasenet.checkpoint))
     # Init data client
     cl = get_client(conf.general.datasource)
     if not cl:
-        print("No client returned, abort")
+        logging.critical("No client returned, abort")
         exit()
     # Init EarthWorm values
     ew = EarthWorm()
     ew.read_conf(conf.earthworm)
-    if conf.general.debug:
-        print("EarthWorm configuration initialized")
+    logging.debug("EarthWorm configuration initialized")
     # Run infinite loop from RealTime
     if conf.general.mode == 'NORMAL':
         while 1:
@@ -387,12 +380,11 @@ def run_loop():
             ti = UTCDateTime.now() - conf.general.latency
             n = run_phasenet(ti, sess, model, cl, conf, ew)
             t1 = time.time() - t0
-            if conf.general.debug:
-                print(UTCDateTime.now(), t1)
-                print('%d picks processed' % (n))
+            logging.debug(UTCDateTime.now(), t1)
+            logging.debug('%d picks processed' % (n))
             if t1 > conf.general.tw:
-                print('Warning, process time %.1fs longer than tw %.1fs'
-                      % (t1, conf.general.tw))
+                logging.warning('Process time %.1fs longer than tw %.1fs'
+                                % (t1, conf.general.tw))
             else:
                 time.sleep(conf.general.tw - t1)
     # Run loop starting from old starttime
@@ -403,10 +395,9 @@ def run_loop():
             n = run_phasenet(ti, sess, model, cl, conf, ew)
             t1 = time.time() - t0
             ti += conf.general.tw
-            if conf.general.debug:
-                print(ti)
+            logging.debug(ti)
             if ti > UTCDateTime.now():
-                print('Reached real-time, stop replay')
+                logging.info('Reached real-time, stop replay')
                 break
     # Exit program
     exit()

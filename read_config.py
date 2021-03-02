@@ -129,9 +129,9 @@ class general(object):
         #   default to 100
         sps = 100
 
-        # Debug mode : set to True to activate debug messages
-        #   default to False, debug mode de-activated
-        debug = False
+        # Log : INFO, DEBUG
+        #   default to INFO
+        log = INFO
 
         # Running mode :
         #   NORMAL : predict and send picks to EarthWorm in almost real-time
@@ -159,6 +159,15 @@ class general(object):
         #   default to True
         write_picks = True
 
+        # PhaseNet probability to weight conversion law
+        #   a           : linear between 0.3 and 1 mapped wt between 3 and 0
+        #   b           :
+        #   linear      : linear between 0 and 1 mapped wt between 3 and 0
+        #   taped_linear: linear between 0 and 1 mapped wt between 3 and 0
+        #                 probablility below 0.3, weight of 3
+        #   default to a
+        prob_to_wt_law = a
+
         """
         section = 'General'
 
@@ -178,9 +187,9 @@ class general(object):
         self.sps = config.getint(section, opt) if config.has_option(
             section, opt) else 100
 
-        opt = 'debug'
-        self.debug = config.getboolean(section, opt) if config.has_option(
-            section, opt) else False
+        opt = 'log'
+        self.log = config.get(section, opt).upper() if config.has_option(
+            section, opt) else 'INFO'
 
         opt = 'mode'
         self.mode = config.get(section, opt) if config.has_option(
@@ -201,6 +210,10 @@ class general(object):
         opt = 'write_picks'
         self.write_picks = config.getboolean(
             section, opt) if config.has_option(section, opt) else True
+
+        opt = 'prob_to_wt_law'
+        self.prob_to_wt_law = config.get(section, opt) if config.has_option(
+            section, opt) else 'a'
 
 
 class Config(object):
