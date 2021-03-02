@@ -305,7 +305,7 @@ def process_picks(picks, traces_stats, ew, conf):
                 # Set pick ID
                 pick.pickid = ew.pickid
                 # Convert PhaseNet probability to Hypo weight
-                pick.set_h71_weight('linear')
+                pick.set_h71_weight('a')
                 if conf.general.debug:
                     pick.print()
                 # Write TYPE_PICK_SCNL message
@@ -390,11 +390,11 @@ def run_loop():
             if conf.general.debug:
                 print(UTCDateTime.now(), t1)
                 print('%d picks processed' % (n))
-            if t1 > conf.general.tw:
+            if t1 > conf.general.tw/2.0:
                 print('Warning, process time %.1fs longer than tw %.1fs'
-                      % (t1, conf.general.tw))
+                      % (t1, conf.general.tw/2.0))
             else:
-                time.sleep(conf.general.tw - t1)
+                time.sleep(conf.general.tw/2.0 - t1)
     # Run loop starting from old starttime
     elif conf.general.mode == 'REPLAY':
         ti = UTCDateTime(conf.general.starttime)
@@ -402,7 +402,7 @@ def run_loop():
             t0 = time.time()
             n = run_phasenet(ti, sess, model, cl, conf, ew)
             t1 = time.time() - t0
-            ti += conf.general.tw
+            ti += conf.general.tw/2.0
             if conf.general.debug:
                 print(ti)
             if ti > UTCDateTime.now():
