@@ -67,6 +67,8 @@ class Pick():
                 wt = 3 * (1 - self.probability)
         # Set weight
         self.weight = wt
+        logging.debug("Proba = %.1f -> weight = %d"
+                      % (self.probability, self.weight))
 
     def print(self):
         """Print the pick to standard output."""
@@ -109,6 +111,9 @@ class EarthWorm():
                 elif 'TYPE_PICK_SCNL' in line:
                     self.msgtype = int(line.split()[2])
             f.close()
+            logging.debug("Found %s = %d"
+                          % (opts.MyInstitutionID, self.instid))
+            logging.debug("Found TYPE_PICK_SCNL = %d", % self.msgtype)
         except OSError:
             logging.error('Unable to open file %s' % file)
         # Search ModuleID, OutRing in earthworm.d file
@@ -121,6 +126,10 @@ class EarthWorm():
                 elif opts.OutRing in line:
                     self.outring = int(line.split()[2])
             f.close()
+            logging.debug("Found %s = %d",
+                          % (opts.MyModuleID, self.modid))
+            logging.debug("Found %s = %d",
+                          % (opts.OutRing, self.outring))
         except OSError:
             logging.error('Unable to open file %s' % file)
 # ___ END : DATA TYPES ________________________________________________________
@@ -131,7 +140,7 @@ def parse_args():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(description="Run PhaseNet picker")
 
-    parser.add_argument("-c", "--configfile",
+    parser.add_argument("-c", "--config-file",
                         help="use configuration file named CONFIG_FILE")
     args = parser.parse_args()
 
@@ -151,6 +160,8 @@ def get_client(data_source):
         else:
             port = int(ew_ws[1])
         client = earthworm.Client(ew_ws[0], port=port, timeout=2.0)
+        logging.debug('Successfully initialized WaveServerV client %s'
+                      % data_server)
         return client
 
     elif data_type == 'slink':
@@ -161,6 +172,8 @@ def get_client(data_source):
         else:
             port = int(slink[1])
         client = seedlink.Client(slink[0], port=port, timeout=2.0)
+        logging.debug('Successfully initialized SeedLink client %s'
+                      % data_server)
         return client
 
     elif data_type == 'sds':
@@ -176,6 +189,8 @@ def get_client(data_source):
             logging.error('Error : failed to connect to %s FDSN webservice'
                           % data_server)
         else:
+            logging.debug('Successfully initialized FDSNWS client %s'
+                          % data_server)
             return client
 
     else:
@@ -198,6 +213,7 @@ def run_phasenet(ti, sess, model, client, conf, ew):
     Sta = [netsta.split('.')[1] for netsta in NetSta_list]
 
     chan_list = list(conf.general.chan_list.split(','))
+    logging.debug('Using channel priority list %s' % chan_list)
 
     t0 = ti-tw
 
@@ -207,6 +223,7 @@ def run_phasenet(ti, sess, model, client, conf, ew):
                                   chan_list, client, client_type)
         logging.debug(st)
         if len(st) == 0:
+            logging.info('No data')
             continue
         st.merge(method=1, fill_value='interpolate')
         st.detrend(type='demean')
@@ -214,6 +231,7 @@ def run_phasenet(ti, sess, model, client, conf, ew):
         try:
             st.interpolate(sampling_rate=sps)
         except Exception:
+            logging.warning('Failed to interpolate data')
             continue
         st = st.slice(starttime=t0, endtime=ti)
         st = st.sort()
@@ -223,10 +241,13 @@ def run_phasenet(ti, sess, model, client, conf, ew):
             for ch in ['E', 'N', 'Z']:
                 tr = st.select(channel='*'+ch)[0]
                 if tr.stats.sampling_rate*tw+1 != tr.stats.npts:
+                    logging.error('Trace inconsistency : %d != %d'
+                                  % (tr.stats.sampling_rate*tw+1, tr.stats.npts))
                     continue
                 data.append(tr.data[:-1])
                 tr_statistics.append(tr.stats)
             if len(data) != 3:
+                logging.error('Found %d channels, not 3' % len(data))
                 continue
         else:
             continue
@@ -234,6 +255,8 @@ def run_phasenet(ti, sess, model, client, conf, ew):
             data.append(np.zeros(np.int(sps*tw)))
             tr = st.select(channel='*'+'Z')[0]
             if tr.stats.sampling_rate*tw+1 != tr.stats.npts:
+                logging.error('Trace inconsistency : %d != %d'
+                              % (tr.stats.sampling_rate*tw+1, tr.stats.npts))
                 continue
             data.append(tr.data[:-1])
             tr_statistics.append(tr.stats)
@@ -241,6 +264,7 @@ def run_phasenet(ti, sess, model, client, conf, ew):
             tr_statistics.append(tr.stats)
         data = np.array(data).T
 
+        logging.info('Sending data to PhaseNet prediction')
         picks = get_prediction(data, sess, model)
         if picks:
             npicks += process_picks(picks, tr_statistics, ew, conf)
@@ -251,7 +275,7 @@ def run_phasenet(ti, sess, model, client, conf, ew):
 def process_picks(picks, traces_stats, ew, conf):
     """Process PhaseNet predictions."""
     npicks = 0
-    logging.debug("Processing <%s> picks" % (traces_stats[0].station))
+    logging.info("Processing <%s> picks" % (traces_stats[0].station))
     for pks in picks:
         # P picks are on colunms 0 and 1 (k=0)
         # S picks are on columns 2 and 3 (k=2)
@@ -275,6 +299,7 @@ def process_picks(picks, traces_stats, ew, conf):
                     time = tr_stats.starttime + tr_stats.delta * idx
                     # Create P-pick with 100 amplitude
                     pick = Pick(time, 'P', proba, scnl, 100, ew)
+                    logging.debug('P pick : %s' % pick.print())
                 elif k == 2:
                     for stats in traces_stats:
                         if (stats.channel.find('N') > 0
@@ -291,6 +316,7 @@ def process_picks(picks, traces_stats, ew, conf):
                     time = tr_stats.starttime + tr_stats.delta * idx
                     # Create S-pick with 400 amplitude
                     pick = Pick(time, 'S', proba, scnl, 400, ew)
+                    logging.debug('S pick : %s' % pick.print())
                 # Read pick number from keeper file
                 if os.path.exists(conf.earthworm.nb_pick_keeper):
                     with open(conf.earthworm.nb_pick_keeper, 'r') as f:
@@ -307,8 +333,8 @@ def process_picks(picks, traces_stats, ew, conf):
                 pick.set_h71_weight(conf.general.prob_to_wt_law)
                 # Write TYPE_PICK_SCNL message
                 if conf.general.write_picks:
+                    logging.info('Writing pick to file')
                     write_pick(pick.TYPE_PICK_SCNL(), conf, pick.pickid)
-                pick.print()
                 # Update pickid
                 if ew.pickid == 999999:
                     ew.pickid = 0
@@ -319,6 +345,7 @@ def process_picks(picks, traces_stats, ew, conf):
                     f.write('%06d' % ew.pickid)
                     f.close()
                 npicks += 1
+    logging.info('Successfully processed %d picks' % npicks)
     return npicks
 
 
@@ -347,7 +374,7 @@ def run_loop():
         conf = read_config.Config()
     log_level = getattr(logging, conf.general.log, None)
     logging.basicConfig(level=log_level)
-    logging.debug("Configuration file <%s> read" % (args.configfile))
+    logging.debug("Configuration file <%s> read" % args.configfile)
     if not os.path.isabs(conf.phasenet.checkpoint):
         appdir = os.path.dirname(os.path.abspath(__file__))
         conf.phasenet.checkpoint = os.path.join(appdir,
@@ -363,7 +390,7 @@ def run_loop():
     # Init neural network model
     sess, model = init_pred(phasenet_config, conf.phasenet)
     logging.debug("Tensor flow model <%s> initialized"
-          % (conf.phasenet.checkpoint))
+                  % conf.phasenet.checkpoint)
     # Init data client
     cl = get_client(conf.general.datasource)
     if not cl:
