@@ -43,16 +43,15 @@ A python environment with proper libraries and modules is necessary to run
 PhaseWorm and the underlying PhaseNet.
 
 ##### Using Anaconda (recommended)
-```bash
+```
 conda create --name phaseworm python=3.8
 conda activate phaseworm
 conda install tensorflow=2.3
-conda install argparse configparser os sys time
 conda install matplotlib scipy numpy
 conda install obspy -c conda-forge
 ```
 ##### Using virtualenv
-```bash
+```
 pip install virtualenv
 virtualenv .phaseworm
 source .phaseworm/bin/activate
