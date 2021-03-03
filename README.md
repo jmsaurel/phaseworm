@@ -21,10 +21,12 @@ respectively, vertical and horizontal channels.
 ---
 ## Installation and configuration
 
-The _PhaseWorm_ code has been developed with **Python 3**,
+The _PhaseWorm_ code has been developed with **Python 3.8**,
 [**ObsPy 1.2.2**](http://www.earthwormcentral.org/)
 and **EarthWorm v7.10**.
 The _PhaseNet_ included version uses **TensorFlow 2**.
+
+*Note that TensorFlow 2 is currently not compatible with Python 3.9.*
 
 
 ### PhaseWorm
