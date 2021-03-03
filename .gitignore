@@ -3,3 +3,5 @@ log
 output
 *.pyc
 *.egg-info
+build/
+dist/
