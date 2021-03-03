@@ -10,7 +10,7 @@ import sys
 path = os.path.join(os.path.abspath(os.path.dirname(inspect.getfile(
     inspect.currentframe()))), 'phaseworm')
 sys.path.insert(0, path)
-from __init__ import version
+from __init__ import __version__
 
 
 setup(
@@ -20,7 +20,7 @@ setup(
     entry_points={
         'console_scripts': ['phaseworm = phaseworm.phaseworm:main'],
         },
-    version=version,
+    version=__version__,
     description='A Python wrap-up of PhaseNet for use with EarthWorm',
     long_description='A Python wrap-up of PhaseNet for use with EarthWorm',
     author='Jean-Marie Saurel',
