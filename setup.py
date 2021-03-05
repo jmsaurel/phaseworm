@@ -40,6 +40,6 @@ setup(
             'Programming Language :: Python :: 3.8',
             'Topic :: Scientific/Engineering',
             'Topic :: Scientific/Engineering :: Physics'],
-    python_requires='>=3.6',
+    python_requires='>=3.6,<3.9',
     install_requires=['obspy>=1.2', 'tensorflow>=2.0']
     )
