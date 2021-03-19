@@ -20,10 +20,10 @@ from obspy.clients import earthworm
 from obspy.clients import fdsn
 from obspy.clients.filesystem import sds
 import numpy as np
-from get_data import get_data_from_client
-import read_config
-from phasenet import app
-from phasenet.app import get_prediction, init_pred
+from phaseworm.get_data import get_data_from_client
+from phaseworm import read_config
+from phaseworm.phasenet import app
+from phaseworm.phasenet.app import get_prediction, init_pred
 
 
 # ___ DATA TYPES ______________________________________________________________

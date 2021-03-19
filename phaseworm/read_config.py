@@ -7,11 +7,10 @@
 """Configuration reading."""
 
 import configparser
-import read_config as rc
 import os
 
 
-class earthworm(object):
+class _Earthworm(object):
     """Private class to store EarthWorm configuration."""
 
     def __init__(self, config):
@@ -70,7 +69,7 @@ class earthworm(object):
         self.pick_dir = os.path.normpath(path)
 
 
-class phasenet(object):
+class _Phasenet(object):
     """Private class to store PhaseNet configuration."""
 
     def __init__(self, config):
@@ -90,7 +89,7 @@ class phasenet(object):
         self.checkpoint = os.path.normpath(path)
 
 
-class general(object):
+class _General(object):
     """Private class to store all general configuration variables."""
 
     def __init__(self, config):
@@ -225,10 +224,10 @@ class Config(object):
         config.read(self.configfile)
 
         # Read EarthWorm section parameters
-        self.earthworm = rc.earthworm(config)
+        self.earthworm = _Earthworm(config)
 
         # Read PhaseNet section parameters
-        self.phasenet = rc.phasenet(config)
+        self.phasenet = _Phasenet(config)
 
         # Read Setting section parameters
-        self.general = rc.general(config)
+        self.general = _General(config)
