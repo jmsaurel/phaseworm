@@ -202,7 +202,7 @@ def run_phasenet(ti, sess, model, client, conf, ew):
 
     for ista in range(len(Sta)):
         print(Sta[ista])
-        st = get_data_from_client(Net[ista], Sta[ista], t0, ti,
+        st = get_data_from_client(Net[ista], Sta[ista], t0-5, ti+5,
                                   chan_list, client, client_type)
         if conf.general.debug:
             print(st)
