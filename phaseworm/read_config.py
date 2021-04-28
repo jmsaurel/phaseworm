@@ -42,7 +42,7 @@ class _Earthworm(object):
         """
         section = 'EarthWorm'
 
-        opt = 'params'
+        opt = 'params_dir'
         path = config.get(section, opt) if config.has_option(
             section, opt) else '/opt/earthworm/run_prod/params'
         self.params = os.path.normpath(path)
