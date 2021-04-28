@@ -8,6 +8,7 @@
 
 import configparser
 import os
+import sys
 
 
 class _Earthworm(object):
@@ -221,7 +222,12 @@ class Config(object):
 
         # Load parameters from config file
         config = configparser.ConfigParser()
-        config.read(self.configfile)
+        try:
+            with open(self.configfile) as fp:
+                config.read_file(fp)
+        except IOError as msg:
+            print(msg)
+            sys.exit(1)
 
         # Read EarthWorm section parameters
         self.earthworm = _Earthworm(config)
