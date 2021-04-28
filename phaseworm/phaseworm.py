@@ -179,6 +179,14 @@ def get_client(data_source):
 
     else:
         print('Error : unknown <%s> server type' % data_type)
+
+
+def unpack_list(string):
+    """Unpack into a list a string containing comma-separated values."""
+    # strip trailing commas, if any, then split
+    outlist = string.rstrip(',').split(',')
+    # strip extra whitespaces
+    return [v.strip() for v in outlist]
 # ___ END : INIT FUNCTIONS ____________________________________________________
 
 
@@ -192,11 +200,10 @@ def run_phasenet(ti, sess, model, client, conf, ew):
     tw = conf.general.tw
     sps = conf.general.sps
 
-    NetSta_list = list(conf.general.station_list.split(','))
-    Net = [netsta.split('.')[0] for netsta in NetSta_list]
-    Sta = [netsta.split('.')[1] for netsta in NetSta_list]
-
-    chan_list = list(conf.general.chan_list.split(','))
+    station_list = unpack_list(conf.general.station_list)
+    Net = [netsta.split('.')[0] for netsta in station_list]
+    Sta = [netsta.split('.')[1] for netsta in station_list]
+    chan_list = unpack_list(conf.general.chan_list)
 
     t0 = ti-tw
 
