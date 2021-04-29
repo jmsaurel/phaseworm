@@ -303,12 +303,10 @@ def process_picks(picks, traces_stats, ew, conf):
                 if os.path.exists(conf.earthworm.nb_pick_keeper):
                     with open(conf.earthworm.nb_pick_keeper, 'r') as f:
                         ew.pickid = int(f.readline())
-                        f.close()
                 else:
                     with open(conf.earthworm.nb_pick_keeper, 'w') as f:
                         ew.pickid = 0
                         f.write(str(ew.pickid))
-                        f.close()
                 # Set pick ID
                 pick.pickid = ew.pickid
                 # Convert PhaseNet probability to Hypo weight
@@ -330,7 +328,6 @@ def process_picks(picks, traces_stats, ew, conf):
                 # Update pick number in keeper file
                 with open(conf.earthworm.nb_pick_keeper, 'w') as f:
                     f.write('%06d' % ew.pickid)
-                    f.close()
                 npicks += 1
     return npicks
 
@@ -343,7 +340,6 @@ def write_pick(msg, conf, pkid):
     tmpfile = os.path.join(tmpdir, str('%06d.pick' % pkid))
     with open(tmpfile, 'w') as f:
         f.write(msg)
-        f.close()
     pick_msg = os.path.join(dest, str('%06d.pick' % pkid))
     os.link(tmpfile, pick_msg)
 
