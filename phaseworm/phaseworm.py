@@ -338,7 +338,9 @@ def process_picks(picks, traces_stats, ew, conf):
 def write_pick(msg, conf, pkid):
     """Write pick message."""
     dest = conf.earthworm.pick_dir
-    tmpfile = os.path.join(dest, 'tmp', str('%06d.pick' % pkid))
+    tmpdir = os.path.join(dest, 'tmp')
+    os.makedirs(tmpdir, exist_ok=True)
+    tmpfile = os.path.join(tmpdir, str('%06d.pick' % pkid))
     with open(tmpfile, 'w') as f:
         f.write(msg)
         f.close()
