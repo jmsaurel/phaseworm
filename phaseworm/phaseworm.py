@@ -387,7 +387,7 @@ def run_loop():
         print("EarthWorm configuration initialized")
     # Run infinite loop from RealTime
     if conf.general.mode == 'NORMAL':
-        while 1:
+        while True:
             t0 = time.time()
             ti = UTCDateTime.now() - conf.general.latency
             n = run_phasenet(ti, sess, model, cl, conf, ew)
@@ -403,7 +403,7 @@ def run_loop():
     # Run loop starting from old starttime
     elif conf.general.mode == 'REPLAY':
         ti = UTCDateTime(conf.general.starttime)
-        while 1:
+        while True:
             t0 = time.time()
             n = run_phasenet(ti, sess, model, cl, conf, ew)
             t1 = time.time() - t0
