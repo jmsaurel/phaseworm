@@ -271,30 +271,30 @@ def process_picks(picks, traces_stats, ew, conf):
                 # Iterate over traces statistics to find vertical channel
                 if k == 0:
                     for stats in traces_stats:
-                        if (stats.channel.find('Z') > 0
-                                or stats.channel.find('3') > 0):
+                        if stats.channel[-1] in ['Z', '3']:
                             tr_stats = stats
                             break
-                    scnl = tr_stats.station + '.' +\
-                        tr_stats.channel + '.' +\
-                        tr_stats.network + '.' +\
-                        tr_stats.location
+                    scnl = '.'.join((
+                        tr_stats.station,
+                        tr_stats.channel,
+                        tr_stats.network,
+                        tr_stats.location,
+                    ))
                     # Calculate pick time from trace starttime, sps and index
                     time = tr_stats.starttime + tr_stats.delta * idx
                     # Create P-pick with 100 amplitude
                     pick = Pick(time, 'P', proba, scnl, 100, ew)
                 elif k == 2:
                     for stats in traces_stats:
-                        if (stats.channel.find('N') > 0
-                                or stats.channel.find('2') > 0
-                                or stats.channel.find('E') > 0
-                                or stats.channel.find('1') > 0):
+                        if stats.channel[-1] in ['N', '2', 'E', '1']:
                             tr_stats = stats
                             break
-                    scnl = tr_stats.station + '.' +\
-                        tr_stats.channel + '.' +\
-                        tr_stats.network + '.' +\
-                        tr_stats.location
+                    scnl = '.'.join((
+                        tr_stats.station,
+                        tr_stats.channel,
+                        tr_stats.network,
+                        tr_stats.location,
+                    ))
                     # Calculate pick time from trace starttime, sps and index
                     time = tr_stats.starttime + tr_stats.delta * idx
                     # Create S-pick with 400 amplitude
