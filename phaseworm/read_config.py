@@ -122,6 +122,11 @@ class _General(object):
         #   default to HH?,BH?,HN?
         chan_list = HH?,EH?,SH?,HN?,BH?
 
+        # Pick S-wave on vertical-only stations
+        #   this will write picks for a fictitious "north" channel
+        #   default to False
+        pick_s_on_vertical = False
+
         # Comma separated Network.Station list to use
         station_list = 1T.MTSB,QM.KNKL,1T.PMZI,AM.R1EE2,AM.R0CC5,ED.MCHI
 
@@ -169,6 +174,10 @@ class _General(object):
         opt = 'chan_list'
         self.chan_list = config.get(section, opt) if config.has_option(
             section, opt) else 'HH?,BH?,HN?'
+
+        opt = 'pick_s_on_vertical'
+        self.pick_s_on_vertical = config.getboolean(
+            section, opt) if config.has_option(section, opt) else False
 
         opt = 'station_list'
         self.station_list = config.get(section, opt) if config.has_option(

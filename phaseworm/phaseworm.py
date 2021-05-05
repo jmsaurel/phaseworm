@@ -236,16 +236,22 @@ def run_phasenet(ti, sess, model, client, conf, ew):
             if len(data) != 3:
                 continue
         else:
-            continue
-            data.append(np.zeros(np.int(sps*tw)))
-            data.append(np.zeros(np.int(sps*tw)))
-            tr = st.select(channel='*'+'Z')[0]
+            try:
+                tr = st.select(channel='*'+'Z')[0]
+            except IndexError:
+                continue
             if tr.stats.sampling_rate*tw+1 != tr.stats.npts:
                 continue
+            # replicate the vertical component three times
+            data.append(tr.data[:-1])
+            data.append(tr.data[:-1])
             data.append(tr.data[:-1])
             tr_statistics.append(tr.stats)
-            tr_statistics.append(tr.stats)
-            tr_statistics.append(tr.stats)
+            if conf.general.pick_s_on_vertical:
+                # create a fictitious "N" channel for S-picks
+                stats_north = tr.stats.copy()
+                stats_north.channel = stats_north.channel[:2] + 'N'
+                tr_statistics.append(stats_north)
         data = np.array(data).T
 
         picks = get_prediction(data, sess, model)
@@ -265,10 +271,13 @@ def process_picks(PNpicks, traces_stats, ew, conf):
         if not p_idxs and not s_idxs:
             return 0
         for p_idx, p_prob in zip(p_idxs, p_probs):
+            tr_stats = None
             for stats in traces_stats:
                 if stats.channel[-1] in ['Z', '3']:
                     tr_stats = stats
                     break
+            if tr_stats is None:
+                continue
             scnl = '.'.join((
                 tr_stats.station,
                 tr_stats.channel,
@@ -280,10 +289,13 @@ def process_picks(PNpicks, traces_stats, ew, conf):
             # Create P-pick with 100 amplitude
             pick_list.append(Pick(time, 'P', p_prob, scnl, 100, ew))
         for s_idx, s_prob in zip(s_idxs, s_probs):
+            tr_stats = None
             for stats in traces_stats:
                 if stats.channel[-1] in ['N', '2', 'E', '1']:
                     tr_stats = stats
                     break
+            if tr_stats is None:
+                continue
             scnl = '.'.join((
                 tr_stats.station,
                 tr_stats.channel,
