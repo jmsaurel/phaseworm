@@ -249,8 +249,7 @@ def run_phasenet(ti, sess, model, client, conf, ew):
         data = np.array(data).T
 
         picks = get_prediction(data, sess, model)
-        if picks:
-            npicks += process_picks(picks, tr_statistics, ew, conf)
+        npicks += process_picks(picks, tr_statistics, ew, conf)
 
     return npicks
 
