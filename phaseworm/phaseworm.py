@@ -255,81 +255,80 @@ def run_phasenet(ti, sess, model, client, conf, ew):
     return npicks
 
 
-def process_picks(picks, traces_stats, ew, conf):
+def process_picks(PNpicks, traces_stats, ew, conf):
     """Process PhaseNet predictions."""
-    npicks = 0
     if conf.general.debug:
         print("Processing <%s> picks" % (traces_stats[0].station))
-    for pks in picks:
-        # P picks are on colunms 0 and 1 (k=0)
-        # S picks are on columns 2 and 3 (k=2)
-        for k in 0, 2:
-            # Iterate over picks
-            for i, idx in enumerate(pks[k]):
-                # Get pick probability
-                proba = pks[k+1][i]
-                # Iterate over traces statistics to find vertical channel
-                if k == 0:
-                    for stats in traces_stats:
-                        if stats.channel[-1] in ['Z', '3']:
-                            tr_stats = stats
-                            break
-                    scnl = '.'.join((
-                        tr_stats.station,
-                        tr_stats.channel,
-                        tr_stats.network,
-                        tr_stats.location,
-                    ))
-                    # Calculate pick time from trace starttime, sps and index
-                    time = tr_stats.starttime + tr_stats.delta * idx
-                    # Create P-pick with 100 amplitude
-                    pick = Pick(time, 'P', proba, scnl, 100, ew)
-                elif k == 2:
-                    for stats in traces_stats:
-                        if stats.channel[-1] in ['N', '2', 'E', '1']:
-                            tr_stats = stats
-                            break
-                    scnl = '.'.join((
-                        tr_stats.station,
-                        tr_stats.channel,
-                        tr_stats.network,
-                        tr_stats.location,
-                    ))
-                    # Calculate pick time from trace starttime, sps and index
-                    time = tr_stats.starttime + tr_stats.delta * idx
-                    # Create S-pick with 400 amplitude
-                    pick = Pick(time, 'S', proba, scnl, 400, ew)
-                # Read pick number from keeper file
-                if os.path.exists(conf.earthworm.nb_pick_keeper):
-                    with open(conf.earthworm.nb_pick_keeper, 'r') as f:
-                        ew.pickid = int(f.readline())
-                else:
-                    with open(conf.earthworm.nb_pick_keeper, 'w') as f:
-                        ew.pickid = 0
-                        f.write(str(ew.pickid))
-                # Set pick ID
-                pick.pickid = ew.pickid
-                # Convert PhaseNet probability to Hypo weight
-                pick.set_h71_weight('a')
-                if conf.general.debug:
-                    pick.print()
-                # Write TYPE_PICK_SCNL message
-                if conf.general.write_picks:
-                    write_pick(pick.TYPE_PICK_SCNL(), conf, pick.pickid)
-                    if conf.general.debug:
-                        pick.print()
-                else:
-                    pick.print()
-                # Update pickid
-                if ew.pickid == 999999:
-                    ew.pickid = 0
-                else:
-                    ew.pickid += 1
-                # Update pick number in keeper file
-                with open(conf.earthworm.nb_pick_keeper, 'w') as f:
-                    f.write('%06d' % ew.pickid)
-                npicks += 1
-    return npicks
+
+    # 1: populate pick list
+    pick_list = []
+    for p_idxs, p_probs, s_idxs, s_probs in PNpicks:
+        if not p_idxs and not s_idxs:
+            return 0
+        for p_idx, p_prob in zip(p_idxs, p_probs):
+            for stats in traces_stats:
+                if stats.channel[-1] in ['Z', '3']:
+                    tr_stats = stats
+                    break
+            scnl = '.'.join((
+                tr_stats.station,
+                tr_stats.channel,
+                tr_stats.network,
+                tr_stats.location,
+            ))
+            # Calculate pick time from trace starttime, sps and index
+            time = tr_stats.starttime + tr_stats.delta * p_idx
+            # Create P-pick with 100 amplitude
+            pick_list.append(Pick(time, 'P', p_prob, scnl, 100, ew))
+        for s_idx, s_prob in zip(s_idxs, s_probs):
+            for stats in traces_stats:
+                if stats.channel[-1] in ['N', '2', 'E', '1']:
+                    tr_stats = stats
+                    break
+            scnl = '.'.join((
+                tr_stats.station,
+                tr_stats.channel,
+                tr_stats.network,
+                tr_stats.location,
+            ))
+            # Calculate pick time from trace starttime, sps and index
+            time = tr_stats.starttime + tr_stats.delta * s_idx
+            # Create S-pick with 400 amplitude
+            pick_list.append(Pick(time, 'S', s_prob, scnl, 400, ew))
+
+    # 2: process pick_list
+    for pick in pick_list:
+        # Read pick number from keeper file
+        if os.path.exists(conf.earthworm.nb_pick_keeper):
+            with open(conf.earthworm.nb_pick_keeper, 'r') as f:
+                ew.pickid = int(f.readline())
+        else:
+            with open(conf.earthworm.nb_pick_keeper, 'w') as f:
+                ew.pickid = 0
+                f.write(str(ew.pickid))
+        # Set pick ID
+        pick.pickid = ew.pickid
+        # Convert PhaseNet probability to Hypo weight
+        pick.set_h71_weight('a')
+        if conf.general.debug:
+            pick.print()
+        # Write TYPE_PICK_SCNL message
+        if conf.general.write_picks:
+            write_pick(pick.TYPE_PICK_SCNL(), conf, pick.pickid)
+            if conf.general.debug:
+                pick.print()
+        else:
+            pick.print()
+        # Update pickid
+        if ew.pickid == 999999:
+            ew.pickid = 0
+        else:
+            ew.pickid += 1
+        # Update pick number in keeper file
+        with open(conf.earthworm.nb_pick_keeper, 'w') as f:
+            f.write('%06d' % ew.pickid)
+
+    return len(pick_list)
 
 
 def write_pick(msg, conf, pkid):
