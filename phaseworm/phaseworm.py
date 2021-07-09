@@ -165,6 +165,7 @@ def get_client(data_source):
     elif data_type == 'sds':
         # SDS = '/data/SDS'
         SDS = data_server
+        client = sds.Client(SDS)
         return client
 
     elif data_type == 'fdsnws':

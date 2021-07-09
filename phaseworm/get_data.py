@@ -114,7 +114,7 @@ def get_data_from_client(net, sta, t0, ti, chan_priority_list, cl, data_type):
         return st
 
     elif data_type == 'sds':
-        st = _get_data_slink(cl, net, sta, chan_priority_list, t0, ti)
+        st = _get_data_sds(cl, net, sta, chan_priority_list, t0, ti)
         return st
 
     elif data_type == 'fdsnws':
