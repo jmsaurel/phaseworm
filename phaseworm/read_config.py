@@ -1,10 +1,14 @@
-# xxxx - PhaseNet picker prediction to EarthWorm
-# Copyright (C) 2020-
-# Lise Retailleau (retailleau@ipgp.fr)
-# Jean-Marie Saurel (saurel@ipgp.fr)
-# Licensed under GNU GPLv3 (see LICENSE.txt)
+"""
+Configuration reading.
 
-"""Configuration reading."""
+:copyright:
+    2020-2021   Jean-Marie Saurel <saurel@ipgp.fr>
+                Lise Retailleau <retailleau@ipgp.fr>
+
+:license:
+    GNU General Public License 3.0
+    https://www.gnu.org/licenses/gpl-3.0.en.html
+"""
 
 import configparser
 import os

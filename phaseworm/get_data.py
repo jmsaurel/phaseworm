@@ -1,4 +1,14 @@
-"""Module to provide data from various clients."""
+"""
+Module to provide data from various clients.
+
+:copyright:
+    2020-2021   Jean-Marie Saurel <saurel@ipgp.fr>
+                Lise Retailleau <retailleau@ipgp.fr>
+
+:license:
+    GNU General Public License 3.0
+    https://www.gnu.org/licenses/gpl-3.0.en.html
+"""
 # from obspy.core import UTCDateTime
 # from obspy.clients import seedlink
 # from obspy.clients import earthworm

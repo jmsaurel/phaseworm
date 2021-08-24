@@ -8,6 +8,14 @@ optional arguments:
   -c CONFIG_FILE, --configfile CONFIG_FILE
                         use configuration file named CONFIG_FILE instead of
                         default config.cfg
+
+:copyright:
+    2020-2021   Jean-Marie Saurel <saurel@ipgp.fr>
+                Lise Retailleau <retailleau@ipgp.fr>
+
+:license:
+    GNU General Public License 3.0
+    https://www.gnu.org/licenses/gpl-3.0.en.html
 """
 
 import sys
