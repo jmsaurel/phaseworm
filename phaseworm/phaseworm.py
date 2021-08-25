@@ -12,6 +12,7 @@ optional arguments:
 :copyright:
     2020-2021   Jean-Marie Saurel <saurel@ipgp.fr>
                 Lise Retailleau <retailleau@ipgp.fr>
+                Claudio Satriano <satriano@ipgp.fr>
 
 :license:
     GNU General Public License 3.0
