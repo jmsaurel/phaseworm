@@ -87,6 +87,8 @@ class Pick():
     def TYPE_PICK_SCNL(self):
         """Write TYPE_PICK_SCNL message."""
         [s, c, n, l] = self.scnl.split('.')
+        if l == '  ' or l == '':
+            l = '--'
         msg = str("%d %d %d %d %s.%s.%s.%s %c%1d %18s %d %d %d\n"
                   % (self.msgtype, self.modid, self.instid,
                      self.pickid, s, c, n, l, self.fm, self.weight,
