@@ -62,7 +62,7 @@ source .phaseworm/bin/activate
 You can install _PhaseWorm_ using `pip` from the main directory:
 
 	pip install .
-	
+
 Or, in "developer mode":
 
 	pip install -e .
@@ -75,6 +75,29 @@ that will be read by the _file2ew_ module and injected into a RingBuffer.
 
 Because _PhaseNet_ is designed to use overlapping time sequences,
 it is recommended to use a _pkfilter_ module to remove duplicated picks.
+
+#### file2ew
+
+PhaseWorm pick file should be looked for regularly by the _file2ew_ module to be
+injected in the correct RingBuffer.
+We recommend a scan every 0.5 second and no logging extensive logging.
+Pick files are written by PhaseWorm with the file extension **.pick**.
+
+Because pick files are written, and then a hard symlink made to the _file2ew_
+ deposit directory, it's recommended to not activate the _SaveDataFiles_
+ option.
+
+The _SuffixType_ option should be configure with the InsitutionID used in the
+ EarthWorm setup.
+
+```
+CheckPeriod     0.5                # sleep this many seconds between looks
+OpenTries       2                  # How many times we'll try to open a file
+OpenWait        100                # Milliseconds to wait between open tries
+SaveDataFiles   0                  # 0 = remove files after processing
+LogOutgoingMsg  0
+SuffixType  .pick     TYPE_PICK_SCNL       INST_xxx
+```
 
 #### pkfilter
 
