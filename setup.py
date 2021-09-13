@@ -12,6 +12,8 @@ path = os.path.join(os.path.abspath(os.path.dirname(inspect.getfile(
 sys.path.insert(0, path)
 from __init__ import __version__
 
+with open('README.md', 'rb') as f:
+    long_descr = f.read().decode('utf-8')
 
 setup(
     name='phaseworm',
@@ -22,7 +24,8 @@ setup(
         },
     version=__version__,
     description='A Python wrap-up of PhaseNet for use with EarthWorm',
-    long_description='A Python wrap-up of PhaseNet for use with EarthWorm',
+    long_description=long_descr,
+    long_description_content_type='text/markdown',
     author='Jean-Marie Saurel',
     author_email='saurel@ipgp.fr',
     url='http://www.ipgp.fr',
