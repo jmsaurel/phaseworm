@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Saurel
+    given-names: Jean-Marie
+    orcid: https://orcid.org/0000-0003-1458-4193
+  - family-names: Retailleau
+    given-names: Lise
+    orcid: https://orcid.org/0000-0002-0711-4540
+  - family-names: Zhu
+    given-names: Weiqiang
+  - family-names: Issartel
+    given-names: Simon
+  - family-names: Satriano
+    given-names: Claudio
+    orcid: https://orcid.org/0000-0002-3039-2530
+  - family-names: Beroza
+    given-names: Greg C.
+title: "PhaseWorm"
+version: 1.0.0
+doi: "10.5194/egusphere-egu21-10646"
+date-released: 2021-08-25
+licence: "GNU GPL3.0"

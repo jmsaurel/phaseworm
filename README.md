@@ -4,6 +4,8 @@ This python script wraps-up [PhaseNet](https://github.com/wayneweiqiang/PhaseNet
 for use as a picker within an [EarthWorm](http://www.earthwormcentral.org/)
 installation.
 
+Saurel, J.-M., Retailleau, L., Zhu, W., Issartel, S., Satriano, C., and Beroza, G. C.: Implementation of a new real time seismicity detector for the Mayotte crisis, EGU General Assembly 2021, online, 19–30 Apr 2021, EGU21-10646, [10.5194/egusphere-egu21-10646](https://doi.org/10.5194/egusphere-egu21-10646), 2021.
+
 PhaseWorm can access data from 3 differents data sources, using [ObsPy](https://www.obspy.org) clients:
 
 * SeedLink
