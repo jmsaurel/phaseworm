@@ -143,6 +143,8 @@ def parse_args():
 
     parser.add_argument("-c", "--configfile",
                         help="use configuration file named CONFIG_FILE")
+    parser.add_argument("-w", "--writehinv",
+                        help="write binder station file from FDSN webservice")
     args = parser.parse_args()
 
     return args
@@ -199,6 +201,64 @@ def unpack_list(string):
     outlist = string.rstrip(',').split(',')
     # strip extra whitespaces
     return [v.strip() for v in outlist]
+
+
+def fdsnws2hinv(netsta_list, chan_list, data_source):
+    """Write binder_ew station file from FDSN webservice."""
+    data_type = data_source.split('://', 1)[0]
+    data_server = data_source.split('://', 1)[1]
+
+    if data_type == 'fdsnws':
+        # fdsn_ws = 'http://195.83.188.34:8080'
+        try:
+            client = fdsn.Client(data_server)
+        except Exception:
+            print('Error : failed to connect to %s FDSN webservice'
+                  % data_server)
+    else:
+        print('Error : %s not an FDSN webservice' % data_source)
+
+    station_list = unpack_list(netsta_list)
+    Net = [netsta.split('.')[0] for netsta in station_list]
+    Sta = [netsta.split('.')[1] for netsta in station_list]
+    channel_list = unpack_list(chan_list)
+    netlist = ','.join(Net)
+    stalist = ','.join(Sta)
+    chanlist = ','.join(channel_list)
+
+    inv = client.get_stations(network=netlist,
+                              station=stalist,
+                              channel=chanlist,
+                              level='channel')
+    for net in inv:
+        for sta in net:
+            for chan in sta:
+                s = sta.code
+                c = chan.code
+                n = net.code
+                l = chan.location_code
+                if l == '' or l == '  ':
+                    l = '--'
+                latd = abs(int(chan.latitude))
+                latmin = 60 * (abs(chan.latitude) - latd)
+                if chan.latitude < 0:
+                    ns = 'S'
+                else:
+                    ns = 'N'
+                lond = abs(int(chan.longitude))
+                lonmin = 60 * (abs(chan.longitude) - lond)
+                if chan.longitude < 0:
+                    ew = 'W'
+                else:
+                    ew = 'E'
+                elev = chan.elevation
+                str = "{:5s} {:2s}  {:3s}  ".format(s, n, c)
+                str = str + "{:02d} {:07.4f}{:s}".format(latd, latmin, ns)
+                str = str + "{:03d} {:07.4f}{:s}".format(lond, lonmin, ew)
+                str = str + "{:07.1f}   ".format(elev)
+                str = str + "A 0.00  0.00  0.00  0.00 1  0.00{:s} 1.000".format(l)
+                print(str)
+
 # ___ END : INIT FUNCTIONS ____________________________________________________
 
 
@@ -400,6 +460,12 @@ def run_loop():
         appdir = os.path.dirname(os.path.abspath(__file__))
         conf.phasenet.checkpoint = os.path.join(appdir,
                                                 conf.phasenet.checkpoint)
+
+    if args.writehinv:
+        fdsnws2hinv(conf.general.station_list,
+                    conf.general.chan_list,
+                    conf.general.datasource)
+        exit()
     # Neural network model configuration
     phasenet_config = app.Config()
     phasenet_config.sampling_rate = conf.general.sps
