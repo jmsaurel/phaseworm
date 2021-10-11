@@ -239,12 +239,28 @@ def run_phasenet(ti, sess, model, client, conf, ew):
         data = []
         tr_statistics = []
         if len(st) == 3:
-            for ch in ['E', 'N', 'Z']:
-                tr = st.select(channel='*'+ch)[0]
-                if tr.stats.sampling_rate*tw+1 != tr.stats.npts:
-                    continue
-                data.append(tr.data[:-1])
-                tr_statistics.append(tr.stats)
+            if st.select(channel='*Z'):
+                if st.select(channel='*N'):
+                    for ch in ['E', 'N', 'Z']:
+                        tr = st.select(channel='*'+ch)[0]
+                        if tr.stats.sampling_rate*tw+1 != tr.stats.npts:
+                            continue
+                        data.append(tr.data[:-1])
+                        tr_statistics.append(tr.stats)
+                elif st.select(channel='*1'):
+                    for ch in ['2', '1', 'Z']:
+                        tr = st.select(channel='*'+ch)[0]
+                        if tr.stats.sampling_rate*tw+1 != tr.stats.npts:
+                            continue
+                        data.append(tr.data[:-1])
+                        tr_statistics.append(tr.stats)
+            else:
+                for ch in ['2', '1', '3']:
+                    tr = st.select(channel='*'+ch)[0]
+                    if tr.stats.sampling_rate*tw+1 != tr.stats.npts:
+                        continue
+                    data.append(tr.data[:-1])
+                    tr_statistics.append(tr.stats)
             if len(data) != 3:
                 continue
         else:
