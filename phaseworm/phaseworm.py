@@ -454,11 +454,20 @@ def run_loop():
             t0 = time.time()
             n = run_phasenet(ti, sess, model, cl, conf, ew)
             t1 = time.time() - t0
+            print('%f' % (n/t1))
+            if n/t1 > conf.general.max_pick_rate:
+                print('Too much picks, sleeping %.1fs'
+                      % (n/conf.general.max_pick_rate - t1))
+                time.sleep(n/conf.general.max_pick_rate - t1)
             ti += conf.general.tw/2.0
             if conf.general.debug:
                 print(ti)
-            if ti > UTCDateTime.now():
-                print('Reached real-time, stop replay')
+            if conf.general.endtime != '':
+                t_end = UTCDateTime(conf.general.endtime)
+            else:
+                t_end = UTCDateTime.now()
+            if ti > t_end:
+                print('Reached real-time or end of replay, stop')
                 break
     # Exit program
     exit()

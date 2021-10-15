@@ -160,6 +160,12 @@ class _General(object):
         #   start time in ISO format YYYY-mm-ddTHH:MM:SS
         starttime =
 
+        # REPLAY mode, parameter is only used in replay mode
+        #   data end time to analyze
+        #   end time in ISO format YYYY-mm-ddTHH:MM:SS
+        #   if not specified, run until reaching real-time
+        endtime =
+
         # NORMAL and REPLAY mode, time window length in seconds
         # to process at a time
         #   default to 30
@@ -168,6 +174,11 @@ class _General(object):
         # Write EW picks : set to True to write TYPE_PICK_SCNL messages
         #   default to True
         write_picks = True
+
+        # Write at most max_pick_rate every second in REPLAY mode
+        # slow down otherwise
+        max_pick_rate = 100
+
 
         """
         section = 'General'
@@ -212,9 +223,17 @@ class _General(object):
         self.starttime = config.get(section, opt) if config.has_option(
             section, opt) else ''
 
+        opt = 'endtime'
+        self.endtime = config.get(section, opt) if config.has_option(
+            section, opt) else ''
+
         opt = 'write_picks'
         self.write_picks = config.getboolean(
             section, opt) if config.has_option(section, opt) else True
+
+        opt = 'max_pick_rate'
+        self.max_pick_rate = config.getfloat(
+            section, opt) if config.has_option(section, opt) else 100
 
 
 class Config(object):
