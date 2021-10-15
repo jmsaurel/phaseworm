@@ -454,7 +454,6 @@ def run_loop():
             t0 = time.time()
             n = run_phasenet(ti, sess, model, cl, conf, ew)
             t1 = time.time() - t0
-            print('%f' % (n/t1))
             if n/t1 > conf.general.max_pick_rate:
                 print('Too much picks, sleeping %.1fs'
                       % (n/conf.general.max_pick_rate - t1))
