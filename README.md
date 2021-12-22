@@ -8,7 +8,7 @@ Saurel, J.-M., Retailleau, L., Zhu, W., Issartel, S., Satriano, C., and Beroza, 
 
 Retailleau, L., Saurel, J.-M., Zhu, W., Satriano, C., Beroza, G. C, Issartel, S., Boissier, P., OVPF Team and OVSM Team. PhaseWorm: A real-time machine-learning-based algorithm for volcano-tectonic earthquake monitoring, in review.
 
-![flow_chart](/doc/flow_chart.png)
+![flow-chart](/doc/flow-chart.png)
 
 PhaseWorm can access data from 4 differents data sources, using [ObsPy](https://www.obspy.org) clients:
 
