@@ -1,20 +1,23 @@
 # PhaseWorm
 
 This python script wraps-up [PhaseNet](https://github.com/wayneweiqiang/PhaseNet)
-for use as a picker within an [EarthWorm](http://www.earthwormcentral.org/)
-installation.
+for use as a picker within an [Earthworm](http://www.earthwormcentral.org/)
+installation. For manual validation of the results, we recommend to use [SeisComP](http://www.seiscomp.de) or [SeisComP3](http://www.seiscomp.de/seiscomp3) software to build a catalog of the events with magnitudes.
 
 Saurel, J.-M., Retailleau, L., Zhu, W., Issartel, S., Satriano, C., and Beroza, G. C.: Implementation of a new real time seismicity detector for the Mayotte crisis, EGU General Assembly 2021, online, 19–30 Apr 2021, EGU21-10646, [10.5194/egusphere-egu21-10646](https://doi.org/10.5194/egusphere-egu21-10646), 2021.
 
 Retailleau, L., Saurel, J.-M., Zhu, W., Satriano, C., Beroza, G. C, Issartel, S., Boissier, P., OVPF Team and OVSM Team. PhaseWorm: A real-time machine-learning-based algorithm for volcano-tectonic earthquake monitoring, in review.
 
-PhaseWorm can access data from 3 differents data sources, using [ObsPy](https://www.obspy.org) clients:
+![flow-chart](/doc/flow-chart.png)
+
+PhaseWorm can access data from 4 differents data sources, using [ObsPy](https://www.obspy.org) clients:
 
 * SeedLink
 * FDSN webservice
-* EarthWorm WaveServerV
+* Earthworm WaveServerV
+* SDS disk file archive
 
-Picks can be written as EarthWorm **TYPE\_PICK\_SCNL** messages files or simply
+Picks can be written as Earthworm **TYPE\_PICK\_SCNL** messages files or simply
 written to the standard output.
 
 PhaseWorm can run in an infinite loop in an almost real-time manner
@@ -27,7 +30,7 @@ respectively, vertical and horizontal channels.
 ## Installation and configuration
 
 The _PhaseWorm_ code has been developed with **Python 3.8**,
-**ObsPy 1.2.2** and **EarthWorm v7.10**.
+**ObsPy 1.2.2** and **Earthworm v7.10**.
 The _PhaseNet_ included version uses **TensorFlow 2**.
 
 *Note that TensorFlow 2 is currently not compatible with Python 3.9.*
@@ -73,8 +76,8 @@ Or, in "developer mode":
 
 
 
-### EarthWorm
-_PhaseWorm_ is designed to output **TYPE\_PICK\_SCNL** EarthWorm messages files
+### Earthworm
+_PhaseWorm_ is designed to output **TYPE\_PICK\_SCNL** Earthworm messages files
 that will be read by the _file2ew_ module and injected into a RingBuffer.
 
 Because _PhaseNet_ is designed to use overlapping time sequences,
@@ -92,7 +95,7 @@ Because pick files are written, and then a hard symlink made to the _file2ew_
  option.
 
 The _SuffixType_ option should be configure with the InsitutionID used in the
- EarthWorm setup.
+ Earthworm setup.
 
 ```
 CheckPeriod     0.5                # sleep this many seconds between looks
@@ -157,8 +160,8 @@ Alternative configuration file can be passed on the command line.
 
 The configuration file is divided into 3 different sections.
 
-### EarthWorm section
-This section defines variables linked to the EarthWorm setup that will be used
+### Earthworm section
+This section defines variables linked to the Earthworm setup that will be used
 to process the pick messages (`module_id`, `inst_id`, `message_id`).
 This section also defines the directory in which **TYPE\_PICK\_SCNL** messages
 will be written to.
@@ -194,7 +197,7 @@ PhaseWorm reads data from FDSN webservice, starting from xxx until xxx.
 ### Real-time mode
 The file `config_rt.cfg` contains a configuration for near real-time use.
 
-PhaseWorm reads data from an EarthWorm WaveServerV (recommended) or SeedLink.
+PhaseWorm reads data from an Earthworm WaveServerV (recommended) or SeedLink.
 
 PhaseWorm write picks in the **TYPE\_PICK\_SCNL** directory.
 
