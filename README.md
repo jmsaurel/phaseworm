@@ -6,7 +6,7 @@ installation. For manual validation of the results, we recommend to use [SeisCom
 
 Saurel, J.-M., Retailleau, L., Zhu, W., Issartel, S., Satriano, C., and Beroza, G. C.: Implementation of a new real time seismicity detector for the Mayotte crisis, EGU General Assembly 2021, online, 19–30 Apr 2021, EGU21-10646, [10.5194/egusphere-egu21-10646](https://doi.org/10.5194/egusphere-egu21-10646), 2021.
 
-Retailleau, L., Saurel, J.-M., Zhu, W., Satriano, C., Beroza, G. C, Issartel, S., Boissier, P., OVPF Team and OVSM Team. PhaseWorm: A real-time machine-learning-based algorithm for volcano-tectonic earthquake monitoring, in review.
+Retailleau, L., Saurel, J.-M., Zhu, W., Satriano, C., Beroza, G. C, Issartel, S., Boissier, P., OVPF Team and OVSM Team. A wrapper to use a machine-learning-based algorithm for earthquake monitoring, Seismological Research Letter, accepted.
 
 ![flow-chart](/doc/flow-chart.png)
 
