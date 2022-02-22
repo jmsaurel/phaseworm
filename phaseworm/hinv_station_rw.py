@@ -144,7 +144,7 @@ def print_hinv(inv):
         for sta in net:
             for loc_cha in sta:
                 hline = inv2hline(net, sta, loc_cha)
-                print(hline)
+                print(hline, end='')
                 n = n + 1
     return n
 

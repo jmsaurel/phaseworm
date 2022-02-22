@@ -193,7 +193,7 @@ class _General(object):
 
         opt = 'station_file'
         self.station_file = config.get(section, opt) if config.has_option(
-            section, opt)
+            section, opt) else ''
 
         opt = 'sps'
         self.sps = config.getint(section, opt) if config.has_option(

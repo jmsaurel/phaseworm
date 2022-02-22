@@ -33,7 +33,7 @@ from phaseworm.get_data import get_data_from_client
 from phaseworm import read_config
 from phaseworm.phasenet import app
 from phaseworm.phasenet.app import get_prediction, init_pred
-from phaseworm.hinv_station_rw import read_hinv, print_hinv
+from phaseworm.hinv_station_rw import read_hinv, print_hinv, write_hinv
 
 
 # ___ DATA TYPES ______________________________________________________________
@@ -204,7 +204,7 @@ def unpack_list(string):
     return [v.strip() for v in outlist]
 
 
-def fdsnws2hinv(netsta_list, chan_list, data_source):
+def fdsnws2hinv(netsta_list, chan_list, data_source, file):
     """Write binder_ew station file from FDSN webservice."""
     data_type = data_source.split('://', 1)[0]
     data_server = data_source.split('://', 1)[1]
@@ -231,7 +231,8 @@ def fdsnws2hinv(netsta_list, chan_list, data_source):
                               station=stalist,
                               channel=chanlist,
                               level='channel')
-    n = print_hinv(inv)
+    n = write_hinv(inv, file)
+    return n
 
 # ___ END : INIT FUNCTIONS ____________________________________________________
 
@@ -436,9 +437,11 @@ def run_loop():
                                                 conf.phasenet.checkpoint)
 
     if args.writehinv:
-        fdsnws2hinv(conf.general.station_list,
-                    conf.general.chan_list,
-                    conf.general.datasource)
+        n = fdsnws2hinv(conf.general.station_list,
+                        conf.general.chan_list,
+                        conf.general.datasource,
+                        args.writehinv)
+        print("%d lines written in <%s> hinv file" % (n, args.writehinv))
         exit()
     if conf.general.station_file:
         inv = read_hinv(conf.general.station_file)
@@ -446,7 +449,8 @@ def run_loop():
         for net in inv:
             for sta in net:
                 sta_list.append('.'.join((net.code, sta.code)))
-        set(sta_list.sort())
+        sta_list.sort()
+        set(sta_list)
         conf.general.station_list = ','.join(sta_list)
     # Neural network model configuration
     phasenet_config = app.Config()
