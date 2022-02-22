@@ -33,6 +33,7 @@ from phaseworm.get_data import get_data_from_client
 from phaseworm import read_config
 from phaseworm.phasenet import app
 from phaseworm.phasenet.app import get_prediction, init_pred
+from phaseworm.hinv_station_rw import read_hinv, print_hinv
 
 
 # ___ DATA TYPES ______________________________________________________________
@@ -230,34 +231,7 @@ def fdsnws2hinv(netsta_list, chan_list, data_source):
                               station=stalist,
                               channel=chanlist,
                               level='channel')
-    for net in inv:
-        for sta in net:
-            for chan in sta:
-                s = sta.code
-                c = chan.code
-                n = net.code
-                l = chan.location_code
-                if l == '' or l == '  ':
-                    l = '--'
-                latd = abs(int(chan.latitude))
-                latmin = 60 * (abs(chan.latitude) - latd)
-                if chan.latitude < 0:
-                    ns = 'S'
-                else:
-                    ns = 'N'
-                lond = abs(int(chan.longitude))
-                lonmin = 60 * (abs(chan.longitude) - lond)
-                if chan.longitude < 0:
-                    ew = 'W'
-                else:
-                    ew = 'E'
-                elev = chan.elevation
-                str = "{:5s} {:2s}  {:3s}  ".format(s, n, c)
-                str = str + "{:02d} {:07.4f}{:s}".format(latd, latmin, ns)
-                str = str + "{:03d} {:07.4f}{:s}".format(lond, lonmin, ew)
-                str = str + "{:07.1f}   ".format(elev)
-                str = str + "A 0.00  0.00  0.00  0.00 1  0.00{:s} 1.000".format(l)
-                print(str)
+    n = print_hinv(inv)
 
 # ___ END : INIT FUNCTIONS ____________________________________________________
 
@@ -466,6 +440,14 @@ def run_loop():
                     conf.general.chan_list,
                     conf.general.datasource)
         exit()
+    if conf.general.station_file:
+        inv = read_hinv(conf.general.station_file)
+        sta_list=[]
+        for net in inv:
+            for sta in net:
+                sta_list.append('.'.join((net.code, sta.code)))
+        set(sta_list.sort())
+        conf.general.station_list = ','.join(sta_list)
     # Neural network model configuration
     phasenet_config = app.Config()
     phasenet_config.sampling_rate = conf.general.sps
