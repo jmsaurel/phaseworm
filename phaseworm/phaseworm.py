@@ -33,7 +33,7 @@ from phaseworm.get_data import get_data_from_client
 from phaseworm import read_config
 from phaseworm.phasenet import app
 from phaseworm.phasenet.app import get_prediction, init_pred
-from phaseworm.hinv_station_rw import read_hinv, print_hinv, write_hinv
+from phaseworm.hinv_station_rw import read_hinv
 
 
 # ___ DATA TYPES ______________________________________________________________
@@ -144,8 +144,6 @@ def parse_args():
 
     parser.add_argument("-c", "--configfile",
                         help="use configuration file named CONFIG_FILE")
-    parser.add_argument("-w", "--writehinv",
-                        help="write binder station file from FDSN webservice")
     args = parser.parse_args()
 
     return args
@@ -203,36 +201,6 @@ def unpack_list(string):
     # strip extra whitespaces
     return [v.strip() for v in outlist]
 
-
-def fdsnws2hinv(netsta_list, chan_list, data_source, file):
-    """Write binder_ew station file from FDSN webservice."""
-    data_type = data_source.split('://', 1)[0]
-    data_server = data_source.split('://', 1)[1]
-
-    if data_type == 'fdsnws':
-        # fdsn_ws = 'http://195.83.188.34:8080'
-        try:
-            client = fdsn.Client(data_server)
-        except Exception:
-            print('Error : failed to connect to %s FDSN webservice'
-                  % data_server)
-    else:
-        print('Error : %s not an FDSN webservice' % data_source)
-
-    station_list = unpack_list(netsta_list)
-    Net = [netsta.split('.')[0] for netsta in station_list]
-    Sta = [netsta.split('.')[1] for netsta in station_list]
-    channel_list = unpack_list(chan_list)
-    netlist = ','.join(Net)
-    stalist = ','.join(Sta)
-    chanlist = ','.join(channel_list)
-
-    inv = client.get_stations(network=netlist,
-                              station=stalist,
-                              channel=chanlist,
-                              level='channel')
-    n = write_hinv(inv, file)
-    return n
 
 # ___ END : INIT FUNCTIONS ____________________________________________________
 
@@ -435,17 +403,9 @@ def run_loop():
         appdir = os.path.dirname(os.path.abspath(__file__))
         conf.phasenet.checkpoint = os.path.join(appdir,
                                                 conf.phasenet.checkpoint)
-
-    if args.writehinv:
-        n = fdsnws2hinv(conf.general.station_list,
-                        conf.general.chan_list,
-                        conf.general.datasource,
-                        args.writehinv)
-        print("%d lines written in <%s> hinv file" % (n, args.writehinv))
-        exit()
     if conf.general.station_file:
         inv = read_hinv(conf.general.station_file)
-        sta_list=[]
+        sta_list = []
         for net in inv:
             for sta in net:
                 sta_list.append('.'.join((net.code, sta.code)))
