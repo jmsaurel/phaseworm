@@ -21,8 +21,6 @@ optional arguments:
 """
 
 import sys
-import os
-import time
 import argparse
 from obspy import read_inventory
 from phaseworm.hinv_station_rw import print_hinv, write_hinv
