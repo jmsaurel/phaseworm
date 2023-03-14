@@ -33,6 +33,7 @@ from phaseworm.get_data import get_data_from_client
 from phaseworm import read_config
 from phaseworm.phasenet import app
 from phaseworm.phasenet.app import get_prediction, init_pred
+from phaseworm.hinv_station_rw import read_hinv
 
 
 # ___ DATA TYPES ______________________________________________________________
@@ -202,6 +203,8 @@ def unpack_list(string):
     outlist = string.rstrip(',').split(',')
     # strip extra whitespaces
     return [v.strip() for v in outlist]
+
+
 # ___ END : INIT FUNCTIONS ____________________________________________________
 
 
@@ -412,6 +415,15 @@ def run_loop():
         appdir = os.path.dirname(os.path.abspath(__file__))
         conf.phasenet.checkpoint = os.path.join(appdir,
                                                 conf.phasenet.checkpoint)
+    if conf.general.station_file:
+        inv = read_hinv(conf.general.station_file)
+        sta_list = []
+        for net in inv:
+            for sta in net:
+                sta_list.append('.'.join((net.code, sta.code)))
+        sta_list.sort()
+        set(sta_list)
+        conf.general.station_list = ','.join(sta_list)
     # Neural network model configuration
     phasenet_config = app.Config()
     phasenet_config.sampling_rate = conf.general.sps

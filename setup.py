@@ -20,7 +20,8 @@ setup(
     packages=['phaseworm', 'phaseworm.phasenet'],
     include_package_data=True,
     entry_points={
-        'console_scripts': ['phaseworm = phaseworm.phaseworm:main'],
+        'console_scripts': ['phaseworm = phaseworm.phaseworm:main',
+                            'stationxml2hinv = phaseworm.stationxml2hinv:main'],
         },
     version=__version__,
     description='A Python wrap-up of PhaseNet for use with EarthWorm',

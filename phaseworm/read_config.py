@@ -135,6 +135,9 @@ class _General(object):
         # Comma separated Network.Station list to use
         station_list = 1T.MTSB,QM.KNKL,1T.PMZI,AM.R1EE2,AM.R0CC5,ED.MCHI
 
+        # Alternative setup, read station file in hypo2000 hinv format
+        station_file = /absolute/path/to/revosima.hinv
+
         # All data are interpolated to sps samples per seconds for PhaseNet
         #   default to 100
         sps = 100
@@ -197,6 +200,10 @@ class _General(object):
 
         opt = 'station_list'
         self.station_list = config.get(section, opt) if config.has_option(
+            section, opt) else ''
+
+        opt = 'station_file'
+        self.station_file = config.get(section, opt) if config.has_option(
             section, opt) else ''
 
         opt = 'sps'
