@@ -54,6 +54,9 @@ class Pick():
 
     def set_h71_weight(self, law):
         """Convert pick probability into Hypo71 weight."""
+        # No weighting, all picks have maximum weight
+        if law == 'equal':
+            wt = 0
         # Linear between and
         if law == 'a':
             wt = -4.29 * self.probability + 4.29
