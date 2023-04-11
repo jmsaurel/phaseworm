@@ -8,7 +8,7 @@ import sys
 
 # Import the version string.
 path = os.path.join(os.path.abspath(os.path.dirname(inspect.getfile(
-    inspect.currentframe()))), 'phaseworm')
+    inspect.currentframe()))), 'phaseworm_sources')
 sys.path.insert(0, path)
 from __init__ import __version__
 
