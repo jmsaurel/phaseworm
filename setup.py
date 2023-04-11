@@ -17,11 +17,11 @@ with open('README.md', 'rb') as f:
 
 setup(
     name='phaseworm',
-    packages=['phaseworm', 'phaseworm.phasenet'],
+    packages=['phaseworm_sources', 'phasenet'],
     include_package_data=True,
     entry_points={
-        'console_scripts': ['phaseworm = phaseworm.phaseworm:main',
-                            'stationxml2hinv = phaseworm.stationxml2hinv:main'],
+        'console_scripts': ['phaseworm = phaseworm_sources.phaseworm:main',
+                            'stationxml2hinv = phaseworm_sources.stationxml2hinv:main'],
         },
     version=__version__,
     description='A Python wrap-up of PhaseNet for use with EarthWorm',
